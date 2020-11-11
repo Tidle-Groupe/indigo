@@ -1,0 +1,17 @@
+{
+    "devtimesleepbuild": "2000",
+    "prefix_domaine": "",
+    "domaines": {
+        "site": "",
+        "assets": "",
+        "api": ""
+    },
+    "variables": [
+    ],
+    "assets": {
+        "js": [
+        ],
+        "css": [
+        ]
+    }
+}

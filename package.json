@@ -1,0 +1,29 @@
+{
+  "name": "compilateur-indigo",
+  "version": "1.0.0",
+  "description": "Compilateur INDIGO",
+  "main": "index.js",
+  "scripts": {
+    "build-prod": "node build-prod.js",
+    "run-dev": "node serveur-dev.js",
+    "create-route": "node create-route.js",
+    "delete-route": "node delete-route.js",
+    "create-page": "node create-page.js",
+    "delete-page": "node delete-page.js"
+  },
+  "author": "theostronaute",
+  "license": "ISC",
+  "dependencies": {
+    "@node-minify/core": "^6.1.0",
+    "@node-minify/csso": "^6.1.0",
+    "@node-minify/html-minifier": "^6.1.0",
+    "@node-minify/uglify-es": "^6.1.0",
+    "child_process": "^1.0.2",
+    "chokidar": "^3.4.3",
+    "fs": "0.0.1-security",
+    "fs-extra": "^9.0.1",
+    "http": "0.0.1-security",
+    "path": "^0.12.7",
+    "url": "^0.11.0"
+  }
+}
