@@ -6,5 +6,9 @@
         "api": ""
     },
     "variables": [
+         {
+             "var": "test",
+             "replace": "test replace"
+         }
     ]
 }

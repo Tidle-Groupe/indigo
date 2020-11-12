@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <title>INDIGO premier démarrage</title>
+    </head>
+    <body>
+        <h1>Bienvenue sur la page home !</h1>
+    </body>
+</html>
