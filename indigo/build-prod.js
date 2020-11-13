@@ -64,9 +64,9 @@ for(let a = 0; a < lengthroutes;){
                         //Vérification de l'extension de la page
                         switch(get_extension(page[b])){
                             case 'po':
-                                //Parsage du fichier pour récupérer les éléments déclaratifs
+                                //Parsage du fichier poe avec renvois sous forme de code html
                                 eval(fs.readFileSync(__dirname + "/parse-po.js")+'');
-                                var page_r = pars_po(page_r);
+                                var page_r = pars_po(page_r, routes[a]);
                             default:
                                 //Par défaut on fait la même manipulation que pour un fichier html
                         }

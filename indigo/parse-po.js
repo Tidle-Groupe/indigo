@@ -1,4 +1,4 @@
-function pars_po(page){
+function pars_po(page, route){
     console.log("Parsage du .po");
 
     //Recherche du début du script
@@ -55,7 +55,7 @@ function pars_po(page){
             for(let a = 0; a < nombre_variable;){
                 var var_value = var_egal[a].split('=');
 
-                //Récupération du nom de la variable sans
+                //Récupération du nom de la variable
                 var var_value_nom = var_value[0].trim();
 
                 //Retrait de la guillemet de la valeur
@@ -73,6 +73,23 @@ function pars_po(page){
         }
 
         //traitement des valeurs
+
+        //Ajout du template
+        //Vérification que l'élément existe
+        if(fs.pathExistsSync('./sources/site/'+route+'/template/'+template_value)){
+            //Vérification qu'il s'agit bien d'un fichier
+            if(fs.lstatSync('./sources/site/'+route+'/template/'+template_value).isFile()){
+                var template_return = fs.readFileSync('./sources/site/'+route+'/template/'+template_value, 'utf8');
+                var page_return = template_return.replace('{{{template-body}}}', page_return);
+            }
+        }
+
+        //Ajout des variables
+        var varlength = tab_variables_nom.length;
+        for(let b = 0; b < varlength;){
+            var page_return = replaceAll("{{{template:"+tab_variables_nom[b]+"}}}", tab_variables_str[b], page_return);
+            b++;
+        }
 
         return page_return;
     }else{

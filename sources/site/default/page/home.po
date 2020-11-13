@@ -2,7 +2,6 @@
 <?po
 @indigo-template = "template_home/home.html";
 title = "INDIGO premier démarrage";
-menu = "test";
 ?>
 <h1>Bienvenue sur la page home !</h1>
 </header>
