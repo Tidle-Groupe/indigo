@@ -7,8 +7,8 @@
     },
     "variables": [
          {
-             "var": "test",
-             "replace": "test replace"
+             "var": "home",
+             "replace": "Bienvenue sur la page home !"
          }
     ]
 }
