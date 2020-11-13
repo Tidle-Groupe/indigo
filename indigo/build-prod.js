@@ -65,11 +65,8 @@ for(let a = 0; a < lengthroutes;){
                         switch(get_extension(page[b])){
                             case 'po':
                                 //Parsage du fichier pour récupérer les éléments déclaratifs
-
-                                //Ajout des layouts
-
-                                //Ajout du template
-
+                                eval(fs.readFileSync(__dirname + "/parse-po.js")+'');
+                                var page_r = pars_po(page_r);
                             default:
                                 //Par défaut on fait la même manipulation que pour un fichier html
                         }
