@@ -2,7 +2,7 @@
   "name": "indigo",
   "version": "1.0.0",
   "description": "Un environnement de programmation léger avec rendu local et construction des fichiers pour la production",
-  "main": "indigo/index.js",
+  "main": "indigo/main.js",
   "scripts": {
     "build-prod": "node indigo/build-prod.js"
   },
