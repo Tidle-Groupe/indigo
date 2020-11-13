@@ -1,5 +1,4 @@
 function pars_po(page, route){
-    console.log("Parsage du .po");
 
     //Recherche du début du script
     var debut = page.indexOf('<?po');
@@ -68,8 +67,6 @@ function pars_po(page, route){
 
                 a++;
             }
-            console.log(tab_variables_nom);
-            console.log(tab_variables_str);
         }
 
         //traitement des valeurs

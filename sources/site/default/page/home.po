@@ -1,7 +1,5 @@
-<header>
 <?po
-@indigo-template = "template_home/home.html";
+@indigo-template = "home/home.html";
 title = "INDIGO premier démarrage";
 ?>
-<h1>Bienvenue sur la page home !</h1>
-</header>
+<indigo:home/home></indigo>

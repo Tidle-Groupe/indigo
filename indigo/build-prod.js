@@ -16,6 +16,28 @@ function get_no_extension(f) {
     let c = f.replace(/^.*\\/, '');
     return c.replace(/\.([a-z]+)$/, '');
 }
+function get_layout(d, r) {
+    //Détection des layouts
+    var layout_get = fs.readdirSync('./sources/site/'+r+'/layout/'+d);
+    var lengthlayout = layout_get.length;
+    for(let a = 0; a < lengthlayout;){
+        //Vérification que l'élément existe
+        if(fs.pathExistsSync('./sources/site/'+r+'/layout/'+d+layout_get[a])){
+            //Si c'est un fichier
+            if(fs.lstatSync('./sources/site/'+r+'/layout/'+d+layout_get[a]).isFile()){
+                if(get_extension(layout_get[a]) == "html"){
+                    layout_route.push(d+get_no_extension(layout_get[a]));
+                }
+            }
+
+            //Si c'est un répertoire
+            if(fs.lstatSync('./sources/site/'+r+'/layout/'+d+layout_get[a]).isDirectory()){
+                get_layout(d+layout_get[a]+'/', r);
+            }
+        }
+        a++;
+    }
+}
 
 //Lecture de la config
 var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
@@ -42,6 +64,11 @@ for(let a = 0; a < lengthroutes;){
         if(fs.lstatSync('./sources/site/'+routes[a]).isDirectory()){
             //Création du répertoire de la route
             fs.mkdirsSync('./build_prod/site/'+routes[a]);
+
+            //Récupération des layouts pour la route
+            var layout_route = [];
+            get_layout('', routes[a]);
+
 
             //Détection des pages présentes dans la route
             var page = fs.readdirSync('./sources/site/'+routes[a]+'/page');
@@ -71,11 +98,20 @@ for(let a = 0; a < lengthroutes;){
                                 //Par défaut on fait la même manipulation que pour un fichier html
                         }
 
+                        //Remplacement des layouts
+                        var lengthlayout = layout_route.length;
+                        for(let c = 0; c < lengthlayout;){
+                            //Vérification qu'il s'agit bien d'un fichier
+                            var layout_return = fs.readFileSync('./sources/site/'+routes[a]+'/layout/'+layout_route[c]+'.html', 'utf8');
+                            var page_r = replaceAll("<indigo:"+layout_route[c]+"></indigo>", layout_return, page_r);
+                            c++;
+                        }
+
                         //Remplacement des variables
                         var lengthvar = config.variables.length;
                         for(let c = 0; c < lengthvar;){
                             var page_r = replaceAll("{{{indigo:"+config.variables[c].var+"}}}", config.variables[c].replace, page_r);
-                            c++;;
+                            c++;
                         }
 
                         //Réecriture du fichier
