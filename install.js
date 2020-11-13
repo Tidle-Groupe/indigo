@@ -1,0 +1,1 @@
+//Script d'installation à l'inistialisation de l'environnement
