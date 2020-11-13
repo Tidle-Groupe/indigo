@@ -45,10 +45,32 @@ function pars_po(page){
 
 
         //Récupération des variables
+        var var_egal = script_po.split('";');
 
+        //Si une déclaration de variable est effectuée
+        if(var_egal.length > 1){
+            var nombre_variable = Number(var_egal.length-1);
+            var tab_variables_nom = [];
+            var tab_variables_str = [];
+            for(let a = 0; a < nombre_variable;){
+                var var_value = var_egal[a].split('=');
 
-        console.log(template_value);
-        console.log(script_po);
+                //Récupération du nom de la variable sans
+                var var_value_nom = var_value[0].trim();
+
+                //Retrait de la guillemet de la valeur
+                var var_value_str = var_value[1].trim();
+                var var_value_str = var_value_str.slice(1);
+
+                //Ajout des valeurs dans le tableau des variables
+                tab_variables_nom.push(var_value_nom);
+                tab_variables_str.push(var_value_str);
+
+                a++;
+            }
+            console.log(tab_variables_nom);
+            console.log(tab_variables_str);
+        }
 
         //traitement des valeurs
 
