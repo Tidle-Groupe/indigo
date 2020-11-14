@@ -1,4 +1,4 @@
 node_modules
 build_prod
 build_dev
-indigo/docker/docker.yml
+indigo/docker/indigo.yml
