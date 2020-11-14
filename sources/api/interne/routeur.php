@@ -8,6 +8,7 @@ if(isset($_GET['url'])) {
 $url = substr($url, 4);
 
 //Include des fonctions de base
+include('config/database.php');
 include('fonctions/fonctions-indigo.php');
 
 //Set des Headers
