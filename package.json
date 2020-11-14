@@ -4,7 +4,8 @@
   "description": "Un environnement de programmation léger avec rendu local et construction des fichiers pour la production",
   "main": "indigo/main.js",
   "scripts": {
-    "build-prod": "node indigo/build-prod.js"
+    "build-prod": "node indigo/run-prod.js",
+    "run-dev": "node indigo/run-dev.js"
   },
   "author": "Théo Laubezout",
   "license": "GPL-3.0",
