@@ -7,7 +7,7 @@
     "build-prod": "node indigo/run-prod.js",
     "run-dev": "node indigo/run-dev.js",
     "docker-up": "docker-compose -f indigo/docker/indigo.yml up -d",
-    "docker-down": "docker-compose -f indigo/docker/indigo.yml up -d"
+    "docker-down": "docker-compose -f indigo/docker/indigo.yml down"
   },
   "author": "Théo Laubezout",
   "license": "GPL-3.0",
