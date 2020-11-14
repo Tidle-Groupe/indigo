@@ -25,6 +25,9 @@ function docker_redis_add(d){
 function docker_postgres_add(d){
     return d+"\r\n\r\n  postgres:\r\n    image: postgres\r\n    restart: always\r\n    ports:\r\n      - 5432:5432\r\n    environment:\r\n      POSTGRES_PASSWORD: admin\r\n\r\n  phppgadmin:\r\n    image: dockage/phppgadmin\r\n    restart: always\r\n    ports:\r\n      - 8081:80";
 }
+function docker_mongodb_add(d){
+    return d+"\r\n\r\n  mongo:\r\n    image: mongo\r\n    restart: always\r\n    ports:\r\n      - 27017:27017\r\n    environment:\r\n      MONGO_INITDB_ROOT_USERNAME: root\r\n      MONGO_INITDB_ROOT_PASSWORD: admin\r\n\r\n  mongo-express:\r\n    image: mongo-express\r\n    restart: always\r\n    ports:\r\n      - 8082:8081\r\n    environment:\r\n      ME_CONFIG_MONGODB_ADMINUSERNAME: root\r\n      ME_CONFIG_MONGODB_ADMINPASSWORD: admin";
+}
 function docker_memcached_add(d){
     return d+"\r\n\r\n  memcached:\r\n    image: memcached\r\n    restart: always\r\n    ports:\r\n      - 11211:11211";
 }
@@ -61,6 +64,10 @@ function bdd_choix(bdd, cache){
         var docker_compose = docker_postgres_add(docker_compose);
         ajout++;
     }*/
+    if(bdd_recherche.includes("mongodb")){
+        var docker_compose = docker_mongodb_add(docker_compose);
+        ajout++;
+    }
 
     //Vérification qu'au moins un élement est détecter
     if(ajout == 0){
