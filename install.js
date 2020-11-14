@@ -1,4 +1,5 @@
 //Script d'installation à l'inistialisation de l'environnement
+const fs = require('fs-extra');
 const readline = require('readline');
 const rl = readline.createInterface({
     input: process.stdin,
@@ -16,7 +17,13 @@ function cleanArray(array) {
     return out;
 }
 function docker_mariadb_add(d){
-    return d+"\r\n\r\n  mariadb:\r\n    image: mariadb\r\n    restart: always\r\n    environment:\r\n      MYSQL_ROOT_PASSWORD: admin";
+    return d+"\r\n\r\n  db:\r\n    image: mariadb\r\n    restart: always\r\n    ports:\r\n      - 3306:3306\r\n    environment:\r\n      MYSQL_ROOT_PASSWORD: admin\r\n\r\n  phpmyadmin:\r\n    image: phpmyadmin\r\n    restart: always\r\n    ports:\r\n      - 8080:80\r\n    environment:\r\n      - PMA_ARBITRARY=1";
+}
+function docker_redis_add(d){
+    return d+"\r\n\r\n  redis:\r\n    image: redis\r\n    restart: always\r\n    ports:\r\n      - 6379:6379";
+}
+function docker_memcached_add(d){
+    return d+"\r\n\r\n  memcached:\r\n    image: memcached\r\n    restart: always\r\n    ports:\r\n      - 11211:11211";
 }
 function bdd_choix(bdd, cache){
     console.log("Installation en cours...");
@@ -43,22 +50,28 @@ function bdd_choix(bdd, cache){
         var docker_compose = docker_mariadb_add(docker_compose);
         ajout++;
     }
+    if(bdd_recherche.includes("redis")){
+        var docker_compose = docker_redis_add(docker_compose);
+        ajout++;
+    }
 
     //Vérification qu'au moins un élement est détecter
     if(ajout == 0){
         //Valeur par défaut si rien n'est rentrer
-        docker_mariadb_add();
+        var docker_compose = docker_mariadb_add(docker_compose);
     }
 
     //Récupération du choix memcached
     switch(cache){
         case 'o':
             //Réponse oui
+            var docker_compose = docker_memcached_add(docker_compose);
         default:
             //Par défaut, non
     }
-    console.log(bdd_recherche);
-    console.log(docker_compose);
+    //Ecriture du fichier docker
+    fs.mkdirsSync('indigo/docker');
+    fs.writeFileSync('indigo/docker/docker.yml', docker_compose, 'utf8');
 }
 
 //Initialisation de la première route
