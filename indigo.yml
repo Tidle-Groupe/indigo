@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   php_site_api:
-    image: indigo/api-interne
+    image: tidleindigo/serverlocal
     restart: always
     ports:
       - 80:80
