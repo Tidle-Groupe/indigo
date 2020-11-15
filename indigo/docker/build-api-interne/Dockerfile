@@ -27,6 +27,5 @@ COPY php.ini /usr/local/etc/php/conf.d/app.ini
 
 # Apache
 COPY vhost.conf /etc/apache2/sites-available/000-default.conf
-COPY interne/ /app/
 
 RUN a2enmod rewrite

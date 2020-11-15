@@ -1,0 +1,43 @@
+version: '3.1'
+
+services:
+
+  api_intern:
+    image: indigo/api
+    restart: always
+    ports:
+      - 81:80
+    links:
+      - db:db
+      - redis:redis
+    volumes:
+      - ./sources/api/interne:/app
+
+  db:
+    image: mariadb
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD: admin
+      - MYSQL_DATABASE: api_interne
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379
+
+  memcached:
+    image: memcached
+    restart: always
+    ports:
+      - 11211:11211

@@ -235,12 +235,12 @@ function build(build){
     js_replace('');
 
 
-    //Gestion de la partie api
+    /*//Gestion de la partie api
 
     //Gestion de la partie api interne
     //Création du répertoire 
     fs.mkdirsSync('./build_api/interne');
 
     //Copie de l'ensemble des fichiers
-    fs.copySync('./sources/api/interne', './build_api/interne');
+    fs.copySync('./sources/api/interne', './build_api/interne');*/
 }

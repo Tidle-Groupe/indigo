@@ -1,6 +1,6 @@
 <?php
 //Déclaration MariaDB
-$mariadb = new PDO("mysql:host=127.0.0.1;dbname=tidle_api;charset=utf8", "root", 'admin');
+$mariadb = new PDO("mysql:host=db;dbname=api_interne;charset=utf8", "root", 'admin');
 
 //Déclaration MongoDB
 
@@ -8,6 +8,6 @@ $mariadb = new PDO("mysql:host=127.0.0.1;dbname=tidle_api;charset=utf8", "root",
 
 //Déclaration Redis
 $redis = new Redis();
-$redis->connect('127.0.0.1', 6379);
+$redis->connect('redis', 6379);
 
 //Déclaration Memcached
