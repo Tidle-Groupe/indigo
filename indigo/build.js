@@ -13,14 +13,16 @@ function build(build){
         //Si l'export est une prod
         var domaine_site = config.domaines.site;
         var domaine_assets = config.domaines.assets;
-        var domaine_api = config.domaines.api;
+        var domaine_api_int = config.domaines.api;
+        var domaine_api_ext = config.domaines.api;
 
         var dir_export = "build_prod";
     }else{
         //Sinon par défaut on considère l'export comme dev
         var domaine_site = "http://localhost";
         var domaine_assets = "http://localhost:9000";
-        var domaine_api = "";
+        var domaine_api_int = "http://localhost/api";
+        var domaine_api_ext = "";
 
         var dir_export = "build_dev";
     }
@@ -67,6 +69,12 @@ function build(build){
     //Copie du fichier de routage
     fs.copySync('./sources/site/routeur.php', './'+dir_export+'/site/routeur.php');
 
+    //Copie du fichier index
+    fs.copySync('./sources/site/index.php', './'+dir_export+'/site/index.php');
+
+    //Copie du fichier .htaccess
+    fs.copySync('./sources/site/.htaccess', './'+dir_export+'/site/.htaccess');
+
     //Détection des routes présentes dans le dossier sources (sources/site/route1, sources/site/route2, etc.)
     var routes = fs.readdirSync('./sources/site');
 
@@ -80,6 +88,9 @@ function build(build){
             if(fs.lstatSync('./sources/site/'+routes[a]).isDirectory()){
                 //Création du répertoire de la route
                 fs.mkdirsSync('./'+dir_export+'/site/'+routes[a]);
+
+                //Déplacement du controleur de la route
+                fs.copySync('./sources/site/'+routes[a]+'/controleur.php', './'+dir_export+'/site/'+routes[a]+'/controleur.php');
 
                 //Récupération des layouts pour la route
                 var layout_route = [];
@@ -137,7 +148,7 @@ function build(build){
                             var page_r = replaceAll('{{{:assets:}}}', domaine_assets, page_r);
 
                             //Remplacement du domaine de l'api
-                            var page_r = replaceAll("{{{:api:}}}", domaine_api, page_r);
+                            //var page_r = replaceAll("{{{:api:}}}", domaine_api, page_r);
 
                             //Réecriture du fichier
                             fs.writeFileSync('./'+dir_export+'/site/'+routes[a]+'/'+page_name+'.html', page_r, 'utf8');

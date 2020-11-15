@@ -2,17 +2,26 @@ version: '3.1'
 
 services:
 
-  api_intern:
+  php_site_api:
     image: indigo/api-interne
     restart: always
     ports:
-      - 81:80
+      - 80:80
     links:
       - db:db
       - redis:redis
       - memcached:memcached
     volumes:
-      - ./sources/api/interne:/app
+      - ./build_dev/site:/app/site
+      - ./sources/api/interne:/app/site/api
+
+  apache_assets:
+    image: httpd
+    restart: always
+    ports:
+      - 9000:80
+    volumes:
+      - ./build_dev/assets:/usr/local/apache2/htdocs
 
   db:
     image: mariadb

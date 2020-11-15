@@ -56,7 +56,7 @@ function bdd_choix(bdd, cache){
     var ajout = 0;
     var links = 0;
     var links_name = "";
-    var docker_compose = "version: '3.1'\r\n\r\nservices:\r\n\r\n  api_interne:\r\n    image: indigo/api-interne\r\n    restart: always\r\n    ports:\r\n      - 81:80\r\n    {links_list}volumes:\r\n      - ./sources/api/interne:/app";
+    var docker_compose = "version: '3.1'\r\n\r\nservices:\r\n\r\n  php_site_api:\r\n    image: indigo/api-interne\r\n    restart: always\r\n    ports:\r\n      - 80:80\r\n    {links_list}volumes:\r\n      - ./build_dev/site:/app/site\r\n      - ./sources/api/interne:/app/site/api\r\n\r\n  apache_assets:\r\n    image: httpd\r\n    restart: always\r\n    ports:\r\n      - 9000:80\r\n    volumes:\r\n      - ./build_dev/assets:/usr/local/apache2/htdocs";
     if(bdd_recherche.includes("mariadb")){
         var docker_compose = docker_mariadb_add(docker_compose);
         ajout++;
