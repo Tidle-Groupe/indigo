@@ -27,7 +27,7 @@ Le cas échéant, ajoutez des captures d'écran pour expliquer votre problème.
   - OS [par exemple Windows]
   - Navigateur [par exemple chrome, safari]
   - Version Node.js [par exemple 14.15.0]
-  - Version php [par exemple 7.4]
+  - Version docker [par exemple 8.0.21]
 
 ** Contexte supplémentaire **
 Ajoutez ici tout autre contexte sur le problème.
