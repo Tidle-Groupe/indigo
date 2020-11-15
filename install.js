@@ -85,7 +85,7 @@ function bdd_choix(bdd, cache){
     }
     //Ecriture du fichier docker
     fs.mkdirsSync('indigo/docker');
-    fs.writeFileSync('indigo/docker/indigo.yml', docker_compose, 'utf8');
+    fs.writeFileSync('indigo.yml', docker_compose, 'utf8');
 }
 
 //Initialisation de la première route
