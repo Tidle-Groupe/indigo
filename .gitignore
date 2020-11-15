@@ -1,4 +1,6 @@
 node_modules
 build_prod
 build_dev
+build_api/interne
+build_api/externe
 indigo/docker/indigo.yml
