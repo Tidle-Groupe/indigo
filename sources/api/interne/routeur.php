@@ -2,7 +2,8 @@
 //Include de sécurité
 include('indigo/secu.php');
 //Set des Headers
-header("Access-Control-Allow-Origin: http://localhost");
+header("Access-Control-Allow-Origin: *");
+header("Vary: Origin");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
@@ -23,7 +24,7 @@ if(crsf_check()){
     switch($url){
         case '/route/test':
             //Exemple d'une route exemple.com/api/route/test
-            include('methode/route-test.php');
+            methodAPI('GET', 'methode/route-test.php');
             break;
         default:
             erreurAPI('no found');

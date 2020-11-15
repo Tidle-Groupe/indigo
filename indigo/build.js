@@ -235,14 +235,19 @@ function build(build){
     js_replace('');
 
 
-    /*//Gestion de la partie api
+    //Gestion de la partie api
 
     //Gestion de la partie api interne
-    //Création du répertoire 
-    fs.mkdirsSync('./build_api/interne');
+    if(build == "prod"){
+        //Création du répertoire 
+        fs.mkdirsSync('./build_prod/api/interne');
 
-    //Copie de l'ensemble des fichiers
-    fs.copySync('./sources/api/interne', './build_api/interne');*/
+        //Copie de l'ensemble des fichiers
+        fs.copySync('./sources/api/interne', './build_prod/api/interne');
 
-    //Modifier le localhost vers le domaine de production du site
+        //Récupération du routeur
+        var api_routeur = fs.readFileSync('./build_prod/api/interne/routeur.php', 'utf8');
+        var api_routeur = replaceAll("header(\"Access-Control-Allow-Origin: *\");", "header(\"Access-Control-Allow-Origin: "+config.domaines.site+"\");", api_routeur);
+        fs.writeFileSync('./build_prod/api/interne/routeur.php', api_routeur, 'utf8');
+    }
 }

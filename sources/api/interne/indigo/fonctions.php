@@ -1,4 +1,9 @@
 <?php
+//Fonction de retour des include avec header method allowe
+function methodAPI($method, $inc){
+    header("Access-Control-Allow-Methods: ".$method);
+    include($inc);
+}
 //Fonction de retour d'erreur
 function erreurAPI($message){
     //Renvois de la réponse

@@ -1,9 +1,9 @@
 {
     "devtimesleepbuild": "2000",
     "domaines": {
-        "site": "",
-        "assets": "",
-        "api": ""
+        "site": "https://exemple.fr",
+        "assets": "https://assets.exemple.fr",
+        "api": "https://api.exemple.fr"
     },
     "variables": [
          {
