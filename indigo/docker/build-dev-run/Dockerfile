@@ -11,6 +11,10 @@ RUN apt-get update
 # PHP Extensions
 #Install pdo_mysql opcache
 RUN docker-php-ext-install -j$(nproc) opcache pdo_mysql
+#Install MongoDB
+RUN apt-get install -y libicu-dev \
+    && pecl install mongodb \
+    && docker-php-ext-enable mongodb
 #Install opcache pdo pdo pgsql_pgsql
 RUN apt-get install -y libpq-dev \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
