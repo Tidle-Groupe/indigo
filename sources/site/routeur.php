@@ -1,5 +1,2 @@
 <?php
-$url = '';
-if(isset($_GET['url'])) {
-    $url = htmlspecialchars($_GET['url']);
-}
+$url = $_SERVER['REQUEST_URI'];

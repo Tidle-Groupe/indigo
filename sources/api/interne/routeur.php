@@ -7,11 +7,7 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 if(crsf_check()){
-    $url = '';
-    $routeur_switch_continu = true;
-    if(isset($_GET['url'])) {
-        $url = $_GET['url'];
-    }
+    $url = $_SERVER['REQUEST_URI'];
     //Suppression du /api
     $url = substr($url, 4);
     
@@ -21,7 +17,7 @@ if(crsf_check()){
     
     //Recherche des routes
     switch($url){
-        case 'route/test':
+        case '/route/test':
             //Exemple d'une route exemple.com/api/route/test
             include('methode/route-test.php');
             break;
