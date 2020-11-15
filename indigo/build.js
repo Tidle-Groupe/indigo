@@ -5,38 +5,42 @@ const htmlMinifier = require('@node-minify/html-minifier');
 const csso = require('@node-minify/csso');
 const uglifyES = require('@node-minify/uglify-es');
 
-function build(build){
-    //Lecture de la config
-    var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
-    //Définition des variables de base
-    if(build == "prod"){
-        //Si l'export est une prod
-        var domaine_site = config.domaines.site;
-        var domaine_assets = config.domaines.assets;
-        var domaine_api_int = config.domaines.api;
-        var domaine_api_ext = config.domaines.api;
+//Lecture de la config
+var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+    
+//Définition des fonctions
+function replaceAll(rec, rem, c){
+    return c.split(rec).join(rem);
+}
+function get_extension(f) {
+    return f.slice((f.lastIndexOf('.') - 1 >>> 0) + 2);
+}
+function get_no_extension(f) {
+    let c = f.replace(/^.*\\/, '');
+    return c.replace(/\.([a-z]+)$/, '');
+}
 
-        var dir_export = "build_prod";
-    }else{
-        //Sinon par défaut on considère l'export comme dev
-        var domaine_site = "http://localhost";
-        var domaine_assets = "http://localhost:9000";
-        var domaine_api_int = "http://localhost/api";
-        var domaine_api_ext = "";
+//Définition des variables de base
+if(build == "prod"){
+    //Si l'export est une prod
+    var domaine_site = config.domaines.site;
+    var domaine_assets = config.domaines.assets;
+    var domaine_api_int = config.domaines.api;
+    var domaine_api_ext = config.domaines.api;
 
-        var dir_export = "build_dev";
-    }
-    //Définition des fonctions
-    function replaceAll(rec, rem, c){
-        return c.split(rec).join(rem);
-    }
-    function get_extension(f) {
-        return f.slice((f.lastIndexOf('.') - 1 >>> 0) + 2);
-    }
-    function get_no_extension(f) {
-        let c = f.replace(/^.*\\/, '');
-        return c.replace(/\.([a-z]+)$/, '');
-    }
+    var dir_export = "build_prod";
+}else{
+    //Sinon par défaut on considère l'export comme dev
+    var domaine_site = "http://localhost";
+    var domaine_assets = "http://localhost:9000";
+    var domaine_api_int = "http://localhost/api";
+    var domaine_api_ext = "";
+
+    var dir_export = "build_dev";
+}
+
+function build_site(build){
+    
     function get_layout(d, r) {
         //Détection des layouts
         var layout_get = fs.readdirSync('./sources/site/'+r+'/layout/'+d);
@@ -176,9 +180,12 @@ function build(build){
 
         a ++;
     }
-
-
+}
+function build_assets(build){
     //Gestion de la partie assets
+
+    //Suppression de l'ancien dossier
+    fs.removeSync('./'+dir_export+'/assets/static');
 
     //Copie du dossier assets
     fs.copySync('./sources/assets/static', './'+dir_export+'/assets/static');
@@ -244,8 +251,8 @@ function build(build){
         }
     }
     js_replace('');
-
-
+}
+function build_api(build){
     //Gestion de la partie api
 
     //Gestion de la partie api interne
