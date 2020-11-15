@@ -6,6 +6,9 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 //Déclarations fonctions
+function replaceAll(rec, rem, c){
+    return c.split(rec).join(rem);
+}
 function cleanArray(array) {
     var i, j, len = array.length, out = [], obj = {};
     for(i = 0; i < len; i++){
@@ -23,7 +26,7 @@ function docker_redis_add(d){
     return d+"\r\n\r\n  redis:\r\n    image: redis\r\n    restart: always\r\n    ports:\r\n      - 6379:6379";
 }
 function docker_postgres_add(d){
-    return d+"\r\n\r\n  postgres:\r\n    image: postgres\r\n    restart: always\r\n    ports:\r\n      - 5432:5432\r\n    environment:\r\n      POSTGRES_PASSWORD: admin\r\n\r\n  phppgadmin:\r\n    image: dockage/phppgadmin\r\n    restart: always\r\n    ports:\r\n      - 8081:80";
+    return d+"\r\n\r\n  postgres:\r\n    image: postgres\r\n    restart: always\r\n    ports:\r\n      - 5432:5432\r\n    environment:\r\n      POSTGRES_PASSWORD: admin\r\n\r\n";
 }
 function docker_mongodb_add(d){
     return d+"\r\n\r\n  mongo:\r\n    image: mongo\r\n    restart: always\r\n    ports:\r\n      - 27017:27017\r\n    environment:\r\n      MONGO_INITDB_ROOT_USERNAME: root\r\n      MONGO_INITDB_ROOT_PASSWORD: admin\r\n\r\n  mongo-express:\r\n    image: mongo-express\r\n    restart: always\r\n    ports:\r\n      - 8082:8081\r\n    environment:\r\n      ME_CONFIG_MONGODB_ADMINUSERNAME: root\r\n      ME_CONFIG_MONGODB_ADMINPASSWORD: admin";
@@ -51,28 +54,40 @@ function bdd_choix(bdd, cache){
     
     //Ajout des éléments pour chaques options
     var ajout = 0;
-    var docker_compose = "version: '3.1'\r\n\r\nservices:\r\n\r\n  api_intern:\r\n    image: indigo/api-interne\r\n    restart: always\r\n    ports:\r\n      - 81:80\r\n    links:\r\n      - db:db\r\n      - redis:redis\r\n    volumes:\r\n      - ./sources/api/interne:/app";
+    var links = 0;
+    var links_name = "";
+    var docker_compose = "version: '3.1'\r\n\r\nservices:\r\n\r\n  api_intern:\r\n    image: indigo/api-interne\r\n    restart: always\r\n    ports:\r\n      - 81:80\r\n    {links_list}volumes:\r\n      - ./sources/api/interne:/app";
     if(bdd_recherche.includes("mariadb")){
         var docker_compose = docker_mariadb_add(docker_compose);
         ajout++;
+        links++;
+        links_name = links_name+"      - db:db\r\n";
     }
     if(bdd_recherche.includes("redis")){
         var docker_compose = docker_redis_add(docker_compose);
         ajout++;
+        links++;
+        links_name = links_name+"      - redis:redis\r\n";
     }
-    /*if(bdd_recherche.includes("postgres")){
+    if(bdd_recherche.includes("postgres")){
         var docker_compose = docker_postgres_add(docker_compose);
         ajout++;
-    }*/
+        links++;
+        links_name = links_name+"      - postgres:postgres\r\n";
+    }
     if(bdd_recherche.includes("mongodb")){
         var docker_compose = docker_mongodb_add(docker_compose);
         ajout++;
+        links++;
+        links_name = links_name+"      - mongo:mongo\r\n";
     }
 
     //Vérification qu'au moins un élement est détecter
     if(ajout == 0){
         //Valeur par défaut si rien n'est rentrer
         var docker_compose = docker_mariadb_add(docker_compose);
+        links++;
+        links_name = links_name+"      - db:db\r\n";
     }
 
     //Récupération du choix memcached
@@ -80,9 +95,20 @@ function bdd_choix(bdd, cache){
         case 'o':
             //Réponse oui
             var docker_compose = docker_memcached_add(docker_compose);
+            links++;
+            links_name = links_name+"      - memcached:memcached\r\n";
         default:
             //Par défaut, non
     }
+
+    //Ajout des links aux bases de données présentes
+    if(links == 0){
+        var links_replace = "";
+    }else{
+        var links_replace = "links:\r\n"+links_name+"    ";
+    }
+    var docker_compose = replaceAll("{links_list}", links_replace, docker_compose);
+
     //Ecriture du fichier docker
     fs.mkdirsSync('indigo/docker');
     fs.writeFileSync('indigo.yml', docker_compose, 'utf8');

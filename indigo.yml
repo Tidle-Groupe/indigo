@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
 
-  api_intern:
+  api_interne:
     image: indigo/api-interne
     restart: always
     ports:
@@ -10,6 +10,9 @@ services:
     links:
       - db:db
       - redis:redis
+      - postgres:postgres
+      - mongo:mongo
+      - memcached:memcached
     volumes:
       - ./sources/api/interne:/app
 
@@ -35,6 +38,34 @@ services:
     restart: always
     ports:
       - 6379:6379
+
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: admin
+
+
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: admin
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8082:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
 
   memcached:
     image: memcached
