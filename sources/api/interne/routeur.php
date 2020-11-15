@@ -10,6 +10,10 @@ if(crsf_check()){
     $url = $_SERVER['REQUEST_URI'];
     //Suppression du /api
     $url = substr($url, 4);
+    //Suppression du / à la fin de l'url si présent
+    if(substr($url, -1) == "/"){
+        $url = substr($url, 0, -1);
+    }
     
     //Include des fonctions de base
     include('config/database.php');
