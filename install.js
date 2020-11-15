@@ -17,7 +17,7 @@ function cleanArray(array) {
     return out;
 }
 function docker_mariadb_add(d){
-    return d+"\r\n\r\n  db:\r\n    image: mariadb\r\n    restart: always\r\n    ports:\r\n      - 3306:3306\r\n    environment:\r\n      MYSQL_ROOT_PASSWORD: admin\r\n\r\n  phpmyadmin:\r\n    image: phpmyadmin\r\n    restart: always\r\n    ports:\r\n      - 8080:80\r\n    environment:\r\n      - PMA_ARBITRARY=1";
+    return d+"\r\n\r\n  db:\r\n    image: mariadb\r\n    restart: always\r\n    ports:\r\n      - 3306:3306\r\n    environment:\r\n      MYSQL_ROOT_PASSWORD: admin\r\n      MYSQL_DATABASE: api_interne\r\n\r\n  phpmyadmin:\r\n    image: phpmyadmin\r\n    restart: always\r\n    ports:\r\n      - 8080:80\r\n    environment:\r\n      - PMA_ARBITRARY=1";
 }
 function docker_redis_add(d){
     return d+"\r\n\r\n  redis:\r\n    image: redis\r\n    restart: always\r\n    ports:\r\n      - 6379:6379";
@@ -51,7 +51,7 @@ function bdd_choix(bdd, cache){
     
     //Ajout des éléments pour chaques options
     var ajout = 0;
-    var docker_compose = "version: '3.1'\r\n\r\nservices:";
+    var docker_compose = "version: '3.1'\r\n\r\nservices:\r\n\r\n  api_intern:\r\n    image: indigo/api-interne\r\n    restart: always\r\n    ports:\r\n      - 81:80\r\n    links:\r\n      - db:db\r\n      - redis:redis\r\n    volumes:\r\n      - ./sources/api/interne:/app";
     if(bdd_recherche.includes("mariadb")){
         var docker_compose = docker_mariadb_add(docker_compose);
         ajout++;

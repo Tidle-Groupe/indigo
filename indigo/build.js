@@ -243,4 +243,6 @@ function build(build){
 
     //Copie de l'ensemble des fichiers
     fs.copySync('./sources/api/interne', './build_api/interne');*/
+
+    //Modifier le localhost vers le domaine de production du site
 }

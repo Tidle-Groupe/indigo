@@ -10,7 +10,7 @@
     "docker-stop": "docker-compose -f indigo.yml stop",
     "docker-install": "docker-compose -f indigo.yml up -d",
     "docker-uninstall": "docker-compose -f indigo.yml down",
-    "build-api-interne": "docker build -t indigo/api-intern ./indigo/docker/build-api-interne"
+    "build-api-interne": "docker build -t indigo/api-interne ./indigo/docker/build-api-interne"
   },
   "author": "Théo Laubezout",
   "license": "GPL-3.0",
