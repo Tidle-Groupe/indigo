@@ -8,7 +8,7 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 if(crsf_check()){
-    $url = $_SERVER['REQUEST_URI'];
+    $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     //Suppression du /api
     $url = substr($url, 4);
     //Suppression du / à la fin de l'url si présent
