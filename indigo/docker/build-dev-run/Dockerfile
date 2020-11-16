@@ -9,8 +9,8 @@ WORKDIR /app
 RUN apt-get update
 
 # PHP Extensions
-#Install pdo_mysql opcache
-RUN docker-php-ext-install -j$(nproc) opcache pdo_mysql
+#Install pdo_mysql
+RUN docker-php-ext-install -j$(nproc) pdo_mysql
 #Install MongoDB
 RUN apt-get install -y libicu-dev \
     && pecl install mongodb \
@@ -26,6 +26,13 @@ RUN mkdir -p /usr/src/php/ext/redis \
     ## cleanup
     && docker-php-source delete
 COPY php.ini /usr/local/etc/php/conf.d/app.ini
+#Install memcache
+RUN apt-get install -y libmemcached-dev zlib1g-dev \
+    && mkdir -p /usr/src/php/ext/memcached \ 
+    && curl -fsSL https://github.com/php-memcached-dev/php-memcached/archive/v3.1.5.tar.gz | tar xvz -C /usr/src/php/ext/memcached --strip 1 \
+    && docker-php-ext-install memcached \
+    ## cleanup
+    && docker-php-source delete
 
 # Apache
 COPY vhost.conf /etc/apache2/sites-available/000-default.conf

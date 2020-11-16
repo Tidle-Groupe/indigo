@@ -14,3 +14,5 @@ $redis = new Redis();
 $redis->connect('redis', 6379);
 
 //Déclaration Memcached
+$memcached = new Memcached();
+$memcached->addServer("memcached", 11211);
