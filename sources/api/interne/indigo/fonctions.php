@@ -18,3 +18,7 @@ function methodeAPI($method, $inc){
         erreurAPI('method not allowed');
     }
 }
+//Fonction de création de cookie
+function setcookieAPI($name, $content, $time, $http){
+    setcookie($name, $content, $time, "/", $domain_cookie, $ssl_cookie, $http);
+}

@@ -17,6 +17,8 @@ if(crsf_check()){
     }
     
     //Include des fonctions de base
+    $domain_cookie = "localhost";
+    $ssl_cookie = false;
     include('config/database.php');
     include('indigo/fonctions.php');
     

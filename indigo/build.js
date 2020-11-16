@@ -25,7 +25,7 @@ if(build == "prod"){
     //Si l'export est une prod
     var domaine_site = config.domaines.site;
     var domaine_assets = config.domaines.assets;
-    var domaine_api_int = config.domaines.api;
+    var domaine_api_int = config.domaines.api+"/api";
     var domaine_api_ext = config.domaines.api;
 
     var dir_export = "build_prod";
@@ -234,9 +234,15 @@ function build_assets(build){
                 //Si c'est un fichier
                 if(fs.lstatSync('./sources/assets/js/'+d+assets_js[a]).isFile()){
                     if(get_extension(assets_js[a]) == "js"){
+                        //Récupération du js
+                        var content_js = fs.readFileSync('./sources/assets/js/'+d+assets_js[a], 'utf8');
+                        //Changement du domaine d'api intern
+                        var content_js = replaceAll('http://api.intern', domaine_api_int, content_js);
+                        //Réecriture du fichier
+                        fs.writeFileSync('./'+dir_export+'/assets/js/'+d+assets_js[a], content_js, 'utf8');
                         minify({
                             compressor: uglifyES,
-                            input: './sources/assets/js/'+d+assets_js[a],
+                            input: './'+dir_export+'/assets/js/'+d+assets_js[a],
                             output: './'+dir_export+'/assets/js/'+d+assets_js[a]
                         });
                     }
@@ -265,7 +271,18 @@ function build_api(build){
 
         //Récupération du routeur
         var api_routeur = fs.readFileSync('./build_prod/api/interne/routeur.php', 'utf8');
+        //Changement du allow origin
         var api_routeur = replaceAll("header(\"Access-Control-Allow-Origin: *\");", "header(\"Access-Control-Allow-Origin: "+config.domaines.site+"\");", api_routeur);
+        //Changement des domaines du site pour l'api interne
+        if(domaine_site.startsWith('https://')){
+            domaine_site_http = replaceAll("https://", "", domaine_site);
+            domaine_site_bo = true;
+        }else{
+            domaine_site_http = replaceAll("http://", "", domaine_site);
+            domaine_site_bo = false;
+        }
+        var api_routeur = replaceAll("$domain_cookie = \"localhost\";", "$domain_cookie = \""+domaine_site_http+"\";", api_routeur);
+        var api_routeur = replaceAll("$ssl_cookie = false;", "$ssl_cookie = "+domaine_site_bo+";", api_routeur);
         fs.writeFileSync('./build_prod/api/interne/routeur.php', api_routeur, 'utf8');
     }
 }
