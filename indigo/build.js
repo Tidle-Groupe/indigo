@@ -158,7 +158,7 @@ function build_site(build){
                                 c++;
                             }
 
-                            replace_domaines(page_r);
+                            var page_r = replace_domaines(page_r);
 
                             //Réecriture du fichier
                             fs.writeFileSync('./'+dir_export+'/site/'+routes[a]+'/'+page_name+'.html', page_r, 'utf8');
@@ -245,7 +245,7 @@ function build_assets(build){
                         //Changement du domaine d'api intern
                         var content_js = replaceAll('http://api.intern', domaine_api_int, content_js);
                         //Changement des domaines
-                        replace_domaines(content_js);
+                        var content_js = replace_domaines(content_js);
                         //Réecriture du fichier
                         fs.writeFileSync('./'+dir_export+'/assets/js/'+d+assets_js[a], content_js, 'utf8');
                         minify({
