@@ -24,7 +24,7 @@ if(crsf_check()){
     switch($url){
         case '/route/test':
             //Exemple d'une route exemple.com/api/route/test
-            methodAPI('GET', 'methode/route-test.php');
+            methodeAPI('GET', 'route-test.php');
             break;
         default:
             erreurAPI('no found');
