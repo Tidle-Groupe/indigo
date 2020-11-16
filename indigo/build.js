@@ -25,7 +25,7 @@ if(build == "prod"){
     //Si l'export est une prod
     var domaine_site = config.domaines.site;
     var domaine_assets = config.domaines.assets;
-    var domaine_api_int = config.domaines.api+"/api";
+    var domaine_api_int = config.domaines.site+"/api";
     var domaine_api_ext = config.domaines.api;
 
     var dir_export = "build_prod";
