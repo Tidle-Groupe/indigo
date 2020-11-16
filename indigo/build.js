@@ -39,6 +39,19 @@ if(build == "prod"){
     var dir_export = "build_dev";
 }
 
+function replace_domaines(input){
+    //Remplacement du domaine du site
+    var page_r = replaceAll('{{{:site:}}}', domaine_site, input);
+
+    //Remplacement du domaine des assets
+    var page_r = replaceAll('{{{:assets:}}}', domaine_assets, page_r);
+
+    //Remplacement du domaine de l'api
+    //var page_r = replaceAll("{{{:api:}}}", domaine_api, page_r);
+
+    return page_r;
+}
+
 function build_site(build){
     
     function get_layout(d, r) {
@@ -145,14 +158,7 @@ function build_site(build){
                                 c++;
                             }
 
-                            //Remplacement du domaine du site
-                            var page_r = replaceAll('{{{:site:}}}', domaine_site, page_r);
-
-                            //Remplacement du domaine des assets
-                            var page_r = replaceAll('{{{:assets:}}}', domaine_assets, page_r);
-
-                            //Remplacement du domaine de l'api
-                            //var page_r = replaceAll("{{{:api:}}}", domaine_api, page_r);
+                            replace_domaines(page_r);
 
                             //Réecriture du fichier
                             fs.writeFileSync('./'+dir_export+'/site/'+routes[a]+'/'+page_name+'.html', page_r, 'utf8');
@@ -238,6 +244,8 @@ function build_assets(build){
                         var content_js = fs.readFileSync('./sources/assets/js/'+d+assets_js[a], 'utf8');
                         //Changement du domaine d'api intern
                         var content_js = replaceAll('http://api.intern', domaine_api_int, content_js);
+                        //Changement des domaines
+                        replace_domaines(content_js);
                         //Réecriture du fichier
                         fs.writeFileSync('./'+dir_export+'/assets/js/'+d+assets_js[a], content_js, 'utf8');
                         minify({
