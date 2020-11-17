@@ -53,6 +53,9 @@ function replace_domaines(input){
 }
 
 function build_site(build){
+
+    //Variables de base
+    var bib_js_w = false;
     
     function get_layout(d, r) {
         //Détection des layouts
@@ -136,6 +139,15 @@ function build_site(build){
                             eval(fs.readFileSync(__dirname + "/parse-po.js")+'');
                             var page_r = pars_po(page_r, routes[a]);
 
+                            //Ajout de la bibliothèque de scripts js
+                            if(page_r.search("<indigo-js></indigo-js>")){
+                                //pour le retour de la création de la bibliothèque dans la section assets
+                                var bib_js_w = true;
+
+                                //Remplacement par la balise de script
+                                var page_r = replaceAll("<indigo-js></indigo-js>", "<script src=\""+domaine_assets+"/js/indigo/script.js\"></script>", page_r);
+                            }
+
                             //Remplacement des layouts
                             var lengthlayout = layout_route.length;
                             for(let c = 0; c < lengthlayout;){
@@ -180,8 +192,11 @@ function build_site(build){
 
         a ++;
     }
+    if(bib_js_w){
+        return true;
+    }
 }
-function build_assets(build){
+function build_assets(build, bib_js){
     //Gestion de la partie assets
 
     //Suppression de l'ancien dossier
@@ -189,6 +204,24 @@ function build_assets(build){
 
     //Copie du dossier assets
     fs.copySync('./sources/assets/static', './'+dir_export+'/assets/static');
+
+    //Ajout de la bibliothèque js indigo 
+    if(bib_js){
+        //Récupération du fichier de fonctions
+        var js_r = fs.readFileSync(__dirname + "/bib/script.js", 'utf8');
+
+        //Parsage des fonctions
+        //Changement des domaines du site pour le cookie secure
+        if(domaine_site.startsWith('https://')){
+            //Remplacement du secure cookie
+            var js_r = replaceAll("function cookieAPI(c,e,o){document.cookie=\"c_check=\"+c+\"; expires=\"+e+\"; path=\"+o}", "function cookieAPI(c,e,o){document.cookie=\"c_check=\"+c+\"; expires=\"+e+\"; Secure; path=\"+o}", js_r);
+        }
+        
+        //Création du dossier d'export
+        fs.mkdirsSync('./'+dir_export+'/assets/js/indigo');
+        //Création du fichier
+        fs.writeFileSync('./'+dir_export+'/assets/js/indigo/script.js', js_r, 'utf8');
+    }
 
     //CSS
     function css_replace(d) {

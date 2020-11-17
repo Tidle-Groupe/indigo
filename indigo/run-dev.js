@@ -14,8 +14,8 @@ const sleep = (milliseconds) => {
 
 //Execution du build de départ
 eval(fs.readFileSync(__dirname + "/build.js")+'');
-build_site("dev");
-build_assets("dev");
+var build_bib_js = build_site("dev");
+build_assets("dev", build_bib_js);
 build_api("dev");
 
 //Ecoute des modifications du dossier sources site
@@ -31,7 +31,7 @@ chokidar.watch('./sources/site').on('all', (event, path) => {
 chokidar.watch('./sources/assets').on('all', (event, path) => {
   if(clockbuildlimite == 0){
     console.log(event, path);
-    build_assets("dev");
+    build_assets("dev", build_bib_js);
     console.log("Build assets fini");
   }
 });
