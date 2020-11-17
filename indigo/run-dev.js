@@ -1,6 +1,8 @@
 const fs = require('fs-extra');
 const chokidar = require('chokidar');
 
+var build = "dev";
+
 //Execution du build de départ
 eval(fs.readFileSync(__dirname + "/build.js")+'');
 //Comptage du temps du build de départ
