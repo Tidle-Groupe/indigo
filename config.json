@@ -1,5 +1,4 @@
 {
-    "devtimesleepbuild": "2000",
     "domaines": {
         "site": "https://exemple.fr",
         "assets": "https://assets.exemple.fr",
