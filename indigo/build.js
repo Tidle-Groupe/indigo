@@ -194,6 +194,8 @@ function build_site(build){
     }
     if(bib_js_w){
         return true;
+    }else{
+        return false;
     }
 }
 function build_assets(build, bib_js){
