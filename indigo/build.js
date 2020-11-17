@@ -78,7 +78,7 @@ function build_site(build){
     }
 
     //Suppression de l'ancien build
-    fs.removeSync("./"+dir_export);
+    fs.removeSync("./"+dir_export+'/site');
 
 
     //Gestion de la partie site
@@ -185,7 +185,7 @@ function build_assets(build){
     //Gestion de la partie assets
 
     //Suppression de l'ancien dossier
-    fs.removeSync('./'+dir_export+'/assets/static');
+    fs.removeSync('./'+dir_export+'/assets');
 
     //Copie du dossier assets
     fs.copySync('./sources/assets/static', './'+dir_export+'/assets/static');
