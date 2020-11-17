@@ -132,15 +132,9 @@ function build_site(build){
                             //Récupération du fichier de la page sans extension
                             var page_name = get_no_extension(page[b]);
 
-                            //Vérification de l'extension de la page
-                            switch(get_extension(page[b])){
-                                case 'po':
-                                    //Parsage du fichier poe avec renvois sous forme de code html
-                                    eval(fs.readFileSync(__dirname + "/parse-po.js")+'');
-                                    var page_r = pars_po(page_r, routes[a]);
-                                default:
-                                    //Par défaut on fait la même manipulation que pour un fichier html
-                            }
+                            //Parsage du po avec renvois sous forme de code html
+                            eval(fs.readFileSync(__dirname + "/parse-po.js")+'');
+                            var page_r = pars_po(page_r, routes[a]);
 
                             //Remplacement des layouts
                             var lengthlayout = layout_route.length;
