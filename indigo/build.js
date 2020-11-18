@@ -56,6 +56,8 @@ function build_site(build){
 
     //Variables de base
     var bib_js_w = false;
+    build_route = [];
+    build_page = [];
     
     function get_layout(d, r) {
         //Détection des layouts
@@ -106,6 +108,11 @@ function build_site(build){
         if(fs.pathExistsSync('./sources/site/'+routes[a])){
             //Vérification qu'il s'agit bien d'un dossier
             if(fs.lstatSync('./sources/site/'+routes[a]).isDirectory()){
+                //Ajout de la route dans le tableau de build_route
+                build_route.push(routes[a]);
+                //Création du tableau pour les pages de la route
+                build_page[routes[a]] = [];
+
                 //Création du répertoire de la route
                 fs.mkdirsSync('./'+dir_export+'/site/'+routes[a]);
 
@@ -128,6 +135,9 @@ function build_site(build){
                     if(fs.pathExistsSync('./sources/site/'+routes[a]+'/page/'+page[b])){
                         //Vérification qu'il s'agit bien d'un fichier
                         if(fs.lstatSync('./sources/site/'+routes[a]+'/page/'+page[b]).isFile()){
+
+                            //Ajout de la page dans le tableau de build_page
+                            build_page[routes[a]].push(page[b]);
 
                             //Récupération de la page
                             var page_r = fs.readFileSync('./sources/site/'+routes[a]+'/page/'+page[b], 'utf8');
@@ -293,6 +303,9 @@ function build_assets(build, bib_js){
             a++;
         }
     }
+    //Parsage du html pour récupérer les éléments js utilisés
+    eval(fs.readFileSync(__dirname + "/parse-html.js")+'');
+    html_parse_js();
     js_replace('');
 }
 function build_api(build){
