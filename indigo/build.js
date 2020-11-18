@@ -23,20 +23,20 @@ function get_no_extension(f) {
 //Définition des variables de base
 if(build == "prod"){
     //Si l'export est une prod
-    var domaine_site = config.domaines.site;
-    var domaine_assets = config.domaines.assets;
-    var domaine_api_int = config.domaines.site+"/api";
-    var domaine_api_ext = config.domaines.api;
+    domaine_site = config.domaines.site;
+    domaine_assets = config.domaines.assets;
+    domaine_api_int = config.domaines.site+"/api";
+    domaine_api_ext = config.domaines.api;
 
-    var dir_export = "build_prod";
+    dir_export = "build_prod";
 }else{
     //Sinon par défaut on considère l'export comme dev
-    var domaine_site = "http://localhost";
-    var domaine_assets = "http://localhost:9000";
-    var domaine_api_int = "http://localhost/api";
-    var domaine_api_ext = "";
+    domaine_site = "http://localhost";
+    domaine_assets = "http://localhost:9000";
+    domaine_api_int = "http://localhost/api";
+    domaine_api_ext = "";
 
-    var dir_export = "build_dev";
+    dir_export = "build_dev";
 }
 
 function replace_domaines(input){

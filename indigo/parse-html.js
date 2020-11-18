@@ -1,7 +1,5 @@
 //Parsage du html pour récupérer les scripts js et css utilisés 
 //Script qui s'effectue une fois la compilation terminée, dans la partie js des assets
-//Fonctions de base
-const fs = require('fs-extra');
 function get_scripts_js(page){
     //Variables de bases
     var regex = /<script.*?src="(.*?)"><\/script>/gmi;
@@ -19,7 +17,7 @@ function get_scripts_js(page){
             //Ajout de la balise dans un tableau
             balisejs.push(src[0]);
             //Ajout de la source dans un tableau
-            srcjs.push(src[1]);
+            srcjs.push(src[1].replace(domaine_assets, ''));
         }
         a++;
     }
@@ -34,28 +32,35 @@ function get_scripts_js(page){
 
     //Gestion du retour
     return srcjs;
-} 
-var page_r = fs.readFileSync('./build_prod/site/default/home.html', 'utf8');
-console.log(get_scripts_js(page_r));
+}
 
 function html_parse_js(){
     //Récupération des routes du dossier à partir d'un tableau créer par le build site
     // build_route => donne la liste des routes, build_page[build_route]=> donne la liste des pages pour une route
 
+    //Variable de base
+    jspagesget = [];
+
     //Récupération de la longueur des routes
     var lengthroutes = build_route.length;
     for(let a = 0; a < lengthroutes;){
         var route = build_route[a];
+        //Création du tableau pour la route
+        jspagesget[route] = [];
         //Récupération de la longueur des routes
         var lengthpages = build_page[route].length;
         for(let b = 0; b < lengthpages;){
             var page = build_page[build_route[a]];
+            //Création du tableau pour la route
+            jspagesget[route][page] = [];
             //Récupération de la page
-            var page_r = fs.readFileSync('./build_prod/site/'+route+'/'+page, 'utf8');
+            var page_r = fs.readFileSync('./'+dir_export+'/site/'+route+'/'+page, 'utf8');
             var array_js = get_scripts_js(page_r);
-            console.log(array_js);
+            jspagesget[route][page].push(array_js);
             b++;
         }
         a++;
     }
+
+    console.log(jspagesget["default"]["home.html"][0][1]);
 }
