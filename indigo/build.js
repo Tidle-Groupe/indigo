@@ -185,7 +185,7 @@ function build_site(build){
                                 input: './'+dir_export+'/site/'+routes[a]+'/'+page_name+'.html',
                                 output: './'+dir_export+'/site/'+routes[a]+'/'+page_name+'.html',
                                 options: {
-                                    removeAttributeQuotes: true,
+                                    removeAttributeQuotes: false,
                                     removeComments: true,
                                     collapseInlineTagWhitespace: false,
                                     removeOptionalTags: false

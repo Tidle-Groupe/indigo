@@ -4,7 +4,7 @@
 const fs = require('fs-extra');
 function get_scripts_js(page){
     //Variables de bases
-    var regex = /<script.*?src=(.*?)><\/script>/gmi;
+    var regex = /<script.*?src="(.*?)"><\/script>/gmi;
     var balisejs = [];
     var srcjs = [];
 
