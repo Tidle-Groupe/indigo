@@ -40,7 +40,9 @@ function html_parse_js(){
 
     //Variable de base
     jspagesget = [];
+    jsuses = [];
 
+    //Vérification des fichiers js utilsiés par chaques pages
     //Récupération de la longueur des routes
     var lengthroutes = build_route.length;
     for(let a = 0; a < lengthroutes;){
@@ -56,11 +58,17 @@ function html_parse_js(){
             //Récupération de la page
             var page_r = fs.readFileSync('./'+dir_export+'/site/'+route+'/'+page, 'utf8');
             var array_js = get_scripts_js(page_r);
-            jspagesget[route][page].push(array_js);
+            var lengtharrayjs = array_js.length;
+            //Boucle de récupération des éléments du tableau
+            for(let c = 0; c < lengtharrayjs;){
+                jspagesget[route][page].push(array_js[c]);
+                jsuses.push(array_js[c]);
+                c++;
+            }
             b++;
         }
         a++;
     }
 
-    console.log(jspagesget["default"]["home.html"][0][1]);
+    
 }
