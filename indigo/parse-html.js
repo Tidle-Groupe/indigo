@@ -117,10 +117,7 @@ function html_parse_js(){
             var page = jsmap[scriptname][b];
             //On récupère l'index de l'élément sur le mappage de la page utiliser
             var ordre = pagemap[page].indexOf(scriptname);
-            if(!jsordre[scriptname][page]){
-                jsordre[scriptname][page] = [];
-            }
-            jsordre[scriptname][page].push(ordre);
+            jsordre[scriptname][page] = ordre;
             b++;
         }
         a++;
@@ -130,15 +127,22 @@ function html_parse_js(){
     var jsuseslength = jsuses.length;
     for(let a = 0; a < jsuseslength;){
         var jsfusionsone = [];
+        var jsfusion = [];
         var scriptname = jsuses[a];
 
         //Fusion des mêmes fichiers utilisés sur plusieurs pages
         //On regarde si le fichier apparaît sur plusieurs pages
         var jsmaplength = jsmap[scriptname].length;
         if(jsmaplength !== 1){
-            //Si le fichier apparaît sur plusieurs pages on vérifie le niveau du fichier sur les autres pages
-            //On récupère les autres pages dans l'ordre
+            //Si le fichier apparaît sur plusieurs pages on récupère l'ordre par apport aux pages
             for(let b = 0; b < jsmaplength;){
+                var page = jsmap[scriptname][b];
+                jsfusionsone[page] = jsordre[scriptname][page];
+                b++;
+            }
+            //On regarde sur chaques pages si un id est présent dans d'autres fichiers
+            for(let b = 0; b < jsmaplength;){
+                var page = jsmap[scriptname][b];
                 b++;
             }
         }
@@ -180,5 +184,5 @@ function html_parse_js(){
     console.log(jsid);*/
     console.log(jsmap);
     console.log(pagemap);
-    console.log(jsordre['/js/script.js']['/default/home.html'][0]);
+    console.log(jsordre['/js/script.js']['/default/home.html']);
 }
