@@ -47,6 +47,19 @@ function mappage_scripts(array_js, page){
     }
 }
 
+function mappage_pages(page, array_js){
+    var lengtharrayjs = array_js.length;
+    //Boucle de récupération des éléments du tableau
+    for(let a = 0; a < lengtharrayjs;){
+        var scriptjs = array_js[a];
+        if(!pagemap[page]){
+            pagemap[page] = [];
+        }
+        pagemap[page].push(scriptjs);
+        a++;
+    }
+}
+
 function html_parse_js(){
     //Récupération des routes du dossier à partir d'un tableau créer par le build site
     // build_route => donne la liste des routes, build_page[build_route]=> donne la liste des pages pour une route
@@ -55,6 +68,7 @@ function html_parse_js(){
     jspagesget = [];
     jsuses = [];
     jsmap = [];
+    pagemap = [];
     jsordre = [];
     jsid = [];
 
@@ -82,6 +96,8 @@ function html_parse_js(){
             }
             //Mappage des scripts par apport aux pages qui les appelles
             mappage_scripts(array_js, '/'+route+'/'+page);
+            //Mappage des pages par apport aux scripts qu'elles appelles
+            mappage_pages('/'+route+'/'+page, array_js);
             b++;
         }
         a++;
@@ -92,22 +108,43 @@ function html_parse_js(){
     var jsuseslength = jsuses.length;
     for(let a = 0; a < jsuseslength;){
         var scriptname = jsuses[a];
-        //On parcours les fichiers ou chaques scripts sont utilisés
+        if(!jsordre[scriptname]){
+            jsordre[scriptname] = [];
+        }
+        //On parcours les pages ou chaques scripts sont utilisés
         jsmaplength = jsmap[scriptname].length;
         for(let b = 0; b < jsmaplength;){
-            var fichier = jsmap[scriptname][b];
-            //On récupère l'index de l'élément sur le mappage du fichier utiliser
-            var ordre = jspagesget[fichier].indexOf(scriptname);
-            if(!jsordre[scriptname]){
-                jsordre[scriptname] = [];
+            var page = jsmap[scriptname][b];
+            //On récupère l'index de l'élément sur le mappage de la page utiliser
+            var ordre = pagemap[page].indexOf(scriptname);
+            if(!jsordre[scriptname][page]){
+                jsordre[scriptname][page] = [];
             }
-            jsordre[scriptname].push(ordre);
+            jsordre[scriptname][page].push(ordre);
             b++;
         }
         a++;
     }
 
     //Gestion des fusions des fichiers utilisés au même niveau et sur les mêmes pages
+    var jsuseslength = jsuses.length;
+    for(let a = 0; a < jsuseslength;){
+        var jsfusionsone = [];
+        var scriptname = jsuses[a];
+
+        //Fusion des mêmes fichiers utilisés sur plusieurs pages
+        //On regarde si le fichier apparaît sur plusieurs pages
+        var jsmaplength = jsmap[scriptname].length;
+        if(jsmaplength !== 1){
+            //Si le fichier apparaît sur plusieurs pages on vérifie le niveau du fichier sur les autres pages
+            //On récupère les autres pages dans l'ordre
+            for(let b = 0; b < jsmaplength;){
+                b++;
+            }
+        }
+
+        a++;
+    }
 
     //Attribution des id de scripts en fonction de l'ordre d'apparition dans les scripts
     var nextidscript = 0;
@@ -136,9 +173,12 @@ function html_parse_js(){
 
 
 
-    console.log(jspagesget["/default/home.html"][0]);
+    /*console.log(jspagesget["/default/home.html"][0]);
     console.log(jsuses);
     console.log(jsmap);
     console.log(jsordre);
-    console.log(jsid);
+    console.log(jsid);*/
+    console.log(jsmap);
+    console.log(pagemap);
+    console.log(jsordre['/js/script.js']['/default/home.html'][0]);
 }
