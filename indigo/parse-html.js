@@ -71,6 +71,9 @@ function html_parse_js(){
     pagemap = [];
     jsordre = [];
     jsid = [];
+    jslistfusions = [];
+    scriptexportbalise = [];
+    var nextidscript = 0;
 
     //Vérification des fichiers js utilsiés par chaques pages
     //Récupération de la longueur des routes
@@ -141,47 +144,65 @@ function html_parse_js(){
             for(let b = 0; b < jsmaplength;){
                 var page = jsmap[scriptname][b];
                 var ordre_execution = jsordre[scriptname][page];
-                jsfusionsone.push(ordre_execution);
+                jsfusion.push(ordre_execution);
                 b++;
             }
             //On regarde sur chaques pages si un id est présent dans d'autres fichiers
             for(let b = 0; b < jsmaplength;){
                 var page = jsmap[scriptname][b];
-                var ordre_execution = jsfusionsone[b];
+                var ordre_execution = jsfusion[b];
                 //Retrait de l'ordre actuel pour la boucle
-                let debut = jsfusionsone.indexOf(ordre_execution);
-                let jsfusionsretrait = jsfusionsone.splice(Number(debut-1), 1);
+                var debut = jsfusion.indexOf(ordre_execution);
+                var jsfusionsretrait = jsfusion.splice(Number(debut-1), 1);
 
                 //On vérifie si il existe un autre élément sur le même ordre dans le tableau
                 if(jsfusionsretrait.includes(ordre_execution)){
-                    console.log("Le fichier est en double !");
+                    jsfusionsone.push(scriptname);
+                    jslistfusions[scriptname] = true;
                 }
                 b++;
             }
-        }
+            //Réalisation de la fusion dans les tableaux d'exports pour chaques éléments
+            for(let b = 0; b < jsfusionsone.length;){
+                var page = jsmap[jsfusionsone[b]];
+                jsid[jsfusionsone[b]] = [nextidscript];
 
+                //Ajout de la balise pour l'export de la page
+                if(scriptexportbalise[page]){
+                    var scriptexportbalisedefine = scriptexportbalise[page];
+                }else{
+                    var scriptexportbalisedefine = "";
+                }
+                scriptexportbalise[page] = scriptexportbalisedefine+"<script type=\"js\" src=\""+domaine_assets+"/js/"+nextidscript+".js\"></script>";
+                
+                nextidscript++;
+                b++;
+            }
+        }
         a++;
     }
 
     //Attribution des id de scripts en fonction de l'ordre d'apparition dans les scripts
-    var nextidscript = 0;
+    var jsfusionsone = [];
+    var jsfusion = [];
     var jsuseslength = jsuses.length;
     for(let a = 0; a < jsuseslength;){
         var scriptname = jsuses[a];
-        //Si le script ne possède qu'un seul ordre 
-        if(jsordre[scriptname].length == 1){
-            jsid[scriptname] = [nextidscript];
-            nextidscript++;
-        }else{
-            //Si le script apparaît à plusieurs ordres
-            var jsordrelength = jsordre[scriptname].length;
-            jsid[scriptname] = [];
-            for(let b = 0; b < jsordrelength;){
-                //On attribut un id à chaques ordres
-                jsid[scriptname][b] = [nextidscript];
-                nextidscript++;
-                b++;
+        for(let b = 0; b < jsfusionsone.length;){
+            var page = jsmap[scriptname][b];
+            //On vérifie si le fichier n'a pas déjà était fusionné
+            if(!jslistfusions[scriptname]){
+                //Ajout de la balise pour l'export de la page
+                if(scriptexportbalise[page]){
+                    var scriptexportbalisedefine = scriptexportbalise[page];
+                }else{
+                    var scriptexportbalisedefine = "";
+                }
+                scriptexportbalise[page] = scriptexportbalisedefine+"<script type=\"js\" src=\""+domaine_assets+"/js/"+nextidscript+".js\"></script>";
+                
             }
+            nextidscript++;
+            b++;
         }
         a++;
     }
@@ -195,7 +216,5 @@ function html_parse_js(){
     console.log(jsmap);
     console.log(jsordre);
     console.log(jsid);*/
-    console.log(jsmap);
-    console.log(pagemap);
-    console.log(jsordre['/js/script.js']['/default/home.html']);
+    console.log(scriptexportbalise);
 }
