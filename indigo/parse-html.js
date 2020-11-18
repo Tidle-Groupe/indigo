@@ -77,10 +77,10 @@ function html_parse_js(){
     var lengthroutes = build_route.length;
     for(let a = 0; a < lengthroutes;){
         var route = build_route[a];
-        //Récupération de la longueur des routes
+        //Récupération de la longueur des pages
         var lengthpages = build_page[route].length;
         for(let b = 0; b < lengthpages;){
-            var page = build_page[build_route[a]];
+            var page = build_page[build_route[a]][b];
             //Récupération de la page
             var page_r = fs.readFileSync('./'+dir_export+'/site/'+route+'/'+page, 'utf8');
             var array_js = get_scripts_js(page_r);
@@ -91,7 +91,9 @@ function html_parse_js(){
                     jspagesget['/'+route+'/'+page] = [];
                 }
                 jspagesget['/'+route+'/'+page].push(array_js[c]);
-                jsuses.push(array_js[c]);
+                if(!jsuses.includes(array_js[c])){
+                    jsuses.push(array_js[c]);
+                }
                 c++;
             }
             //Mappage des scripts par apport aux pages qui les appelles
@@ -145,6 +147,7 @@ function html_parse_js(){
                 var page = jsmap[scriptname][b];
                 b++;
             }
+            console.log(jsfusionsone['/default/home.html']);
         }
 
         a++;
