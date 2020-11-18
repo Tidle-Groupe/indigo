@@ -126,6 +126,7 @@ function html_parse_js(){
     }
 
     //Gestion des fusions des fichiers utilisés au même niveau et sur les mêmes pages
+    //Boucle sur un même fichier
     var jsuseslength = jsuses.length;
     for(let a = 0; a < jsuseslength;){
         var jsfusionsone = [];
@@ -139,15 +140,24 @@ function html_parse_js(){
             //Si le fichier apparaît sur plusieurs pages on récupère l'ordre par apport aux pages
             for(let b = 0; b < jsmaplength;){
                 var page = jsmap[scriptname][b];
-                jsfusionsone[page] = jsordre[scriptname][page];
+                var ordre_execution = jsordre[scriptname][page];
+                jsfusionsone.push(ordre_execution);
                 b++;
             }
             //On regarde sur chaques pages si un id est présent dans d'autres fichiers
             for(let b = 0; b < jsmaplength;){
                 var page = jsmap[scriptname][b];
+                var ordre_execution = jsfusionsone[b];
+                //Retrait de l'ordre actuel pour la boucle
+                let debut = jsfusionsone.indexOf(ordre_execution);
+                let jsfusionsretrait = jsfusionsone.splice(Number(debut-1), 1);
+
+                //On vérifie si il existe un autre élément sur le même ordre dans le tableau
+                if(jsfusionsretrait.includes(ordre_execution)){
+                    console.log("Le fichier est en double !");
+                }
                 b++;
             }
-            console.log(jsfusionsone['/default/home.html']);
         }
 
         a++;
