@@ -34,6 +34,19 @@ function get_scripts_js(page){
     return srcjs;
 }
 
+function mappage_scripts(array_js, page){
+    var lengtharrayjs = array_js.length;
+    //Boucle de récupération des éléments du tableau
+    for(let a = 0; a < lengtharrayjs;){
+        var scriptjs = array_js[a];
+        if(!jsmap[array_js[a]]){
+            jsmap[scriptjs] = [];
+        }
+        jsmap[scriptjs].push(page);
+        a++;
+    }
+}
+
 function html_parse_js(){
     //Récupération des routes du dossier à partir d'un tableau créer par le build site
     // build_route => donne la liste des routes, build_page[build_route]=> donne la liste des pages pour une route
@@ -41,34 +54,91 @@ function html_parse_js(){
     //Variable de base
     jspagesget = [];
     jsuses = [];
+    jsmap = [];
+    jsordre = [];
+    jsid = [];
 
     //Vérification des fichiers js utilsiés par chaques pages
     //Récupération de la longueur des routes
     var lengthroutes = build_route.length;
     for(let a = 0; a < lengthroutes;){
         var route = build_route[a];
-        //Création du tableau pour la route
-        jspagesget[route] = [];
         //Récupération de la longueur des routes
         var lengthpages = build_page[route].length;
         for(let b = 0; b < lengthpages;){
             var page = build_page[build_route[a]];
-            //Création du tableau pour la route
-            jspagesget[route][page] = [];
             //Récupération de la page
             var page_r = fs.readFileSync('./'+dir_export+'/site/'+route+'/'+page, 'utf8');
             var array_js = get_scripts_js(page_r);
             var lengtharrayjs = array_js.length;
             //Boucle de récupération des éléments du tableau
             for(let c = 0; c < lengtharrayjs;){
-                jspagesget[route][page].push(array_js[c]);
+                if(!jspagesget['/'+route+'/'+page]){
+                    jspagesget['/'+route+'/'+page] = [];
+                }
+                jspagesget['/'+route+'/'+page].push(array_js[c]);
                 jsuses.push(array_js[c]);
                 c++;
             }
+            //Mappage des scripts par apport aux pages qui les appelles
+            mappage_scripts(array_js, '/'+route+'/'+page);
             b++;
         }
         a++;
     }
 
-    
+    //On regarde sur quel niveau se trouve le script dans chaques scripts
+    //On parcourt chaques scripts déclarés
+    var jsuseslength = jsuses.length;
+    for(let a = 0; a < jsuseslength;){
+        var scriptname = jsuses[a];
+        //On parcours les fichiers ou chaques scripts sont utilisés
+        jsmaplength = jsmap[scriptname].length;
+        for(let b = 0; b < jsmaplength;){
+            var fichier = jsmap[scriptname][b];
+            //On récupère l'index de l'élément sur le mappage du fichier utiliser
+            var ordre = jspagesget[fichier].indexOf(scriptname);
+            if(!jsordre[scriptname]){
+                jsordre[scriptname] = [];
+            }
+            jsordre[scriptname].push(ordre);
+            b++;
+        }
+        a++;
+    }
+
+    //Gestion des fusions des fichiers utilisés au même niveau et sur les mêmes pages
+
+    //Attribution des id de scripts en fonction de l'ordre d'apparition dans les scripts
+    var nextidscript = 0;
+    var jsuseslength = jsuses.length;
+    for(let a = 0; a < jsuseslength;){
+        var scriptname = jsuses[a];
+        //Si le script ne possède qu'un seul ordre 
+        if(jsordre[scriptname].length == 1){
+            jsid[scriptname] = [nextidscript];
+            nextidscript++;
+        }else{
+            //Si le script apparaît à plusieurs ordres
+            var jsordrelength = jsordre[scriptname].length;
+            jsid[scriptname] = [];
+            for(let b = 0; b < jsordrelength;){
+                //On attribut un id à chaques ordres
+                jsid[scriptname][b] = [nextidscript];
+                nextidscript++;
+                b++;
+            }
+        }
+        a++;
+    }
+
+    //Réecriture des pages avec la balise avec le ou les nouveaux script
+
+
+
+    console.log(jspagesget["/default/home.html"][0]);
+    console.log(jsuses);
+    console.log(jsmap);
+    console.log(jsordre);
+    console.log(jsid);
 }
