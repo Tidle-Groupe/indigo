@@ -1,0 +1,1 @@
+Il n'est pas recommander d'utiliser une balise script pour directement y écrire du js, les balises js étants réecrites en dernière, le script js dans les balises scripts sera executer en premier
