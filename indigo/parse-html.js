@@ -4,7 +4,7 @@
 const fs = require('fs-extra');
 function get_scripts_js(page){
     //Variables de bases
-    var regex = /<script.*?src="(.*?)"><\/script>/gmi;
+    var regex = /<script.*?src=(.*?)><\/script>/gmi;
     var balisejs = [];
     var srcjs = [];
 
@@ -15,14 +15,15 @@ function get_scripts_js(page){
     for(let a = 0; a < scriptlength;){
         //Vérification qu'il s'agit d'une balise script src
         var src = regex.exec(page);
+        if(src){
             //Ajout de la balise dans un tableau
             balisejs.push(src[0]);
             //Ajout de la source dans un tableau
             srcjs.push(src[1]);
-            console.log("tst");
+        }
         a++;
     }
-    //Boucle de retrait des balises scripts de la page
+    //Boucle de retrait des balsies scripts de la page
     for(let a = 0; a < scriptlength;){
         //Retrait de la balise script de la page
         var page = page.replace(balisejs[a], '');
@@ -32,8 +33,8 @@ function get_scripts_js(page){
     var balisejs = [];
 
     //Gestion du retour
-    return scriptlength;
-}
+    return srcjs;
+} 
 var page_r = fs.readFileSync('./build_prod/site/default/home.html', 'utf8');
 console.log(get_scripts_js(page_r));
 
