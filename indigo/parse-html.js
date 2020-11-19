@@ -1,6 +1,6 @@
 //Parsage du html pour récupérer les scripts js et css utilisés 
 //Script qui s'effectue une fois la compilation terminée, dans la partie js des assets
-function get_scripts_js(page, page_name){
+function get_scripts_js(page){
     //Variables de bases
     var regex = /<script.*?src="(.*?)"><\/script>/gmi;
     var balisejs = [];
@@ -34,6 +34,10 @@ function get_scripts_js(page, page_name){
     return srcjs;
 }
 
+function create_balise(idscript){
+    return "<script src=\""+domaine_assets+"/js/"+idscript+".js\"></script>";
+}
+
 function html_parse_js(){
     //Récupération des routes du dossier à partir d'un tableau créer par le build site
     // build_route => donne la liste des routes, build_page[build_route]=> donne la liste des pages pour une route
@@ -54,7 +58,7 @@ function html_parse_js(){
             var page = build_page[build_route[a]][b];
             //Récupération de la page
             var page_r = fs.readFileSync('./'+dir_export+'/site/'+route+'/'+page, 'utf8');
-            var get_scripts = get_scripts_js(page_r, route+'-'+page);
+            var get_scripts = get_scripts_js(page_r);
 
             //Récupération du mappage
             var lengthscript = get_scripts.length;
@@ -87,6 +91,7 @@ function html_parse_js(){
 
     //Tableaux des ids pour chaques scripts
     idscriptsjs = [];
+    var incrid = 0;
 
     //Assignation d'un id pour chaques scripts
     var jsutiliseslength = jsutilises.length;
@@ -94,6 +99,7 @@ function html_parse_js(){
         var scriptname = jsutilises[a];
         idscriptsjs[scriptname] = a;
         a++;
+        incrid++;
     }
     console.log(idscriptsjs);
 
@@ -223,7 +229,57 @@ function html_parse_js(){
 
         a++;
     }
+
+    //Tableaux des ids pour chaques fusions
+    idscriptsjsfusion = [];
+
+    //Assignation d'un id pour chaques fusions
+    var fusionpagelength = fusion.length;
+    for(let a = 0; a < fusionpagelength;){
+        idscriptsjsfusion.push(incrid);
+        a++;
+        incrid++;
+    }
+
+    //Tableau des balises d'export
+    var exportbalisespages = [];
+
+    //Création des balises de scripts pour chaques pages
+    //On récupère une page
+    var pageutiliseslength = pageutilises.length;
+    for(let a = 0; a < pageutiliseslength;){
+        var page = pageutilises[a];
+        var fusionnumber = [];
+        exportbalisespages[page] = [];
+        
+        //On regarde si la page apparaît dans un tableau de fusion
+        var fusionpagelength = fusionpage.length;
+        for(let b = 0; b < fusionpagelength;){
+            var tabfusionone = fusionpage[b];
+            //Si la page apparaît dans le tableau de fusion
+            if(tabfusionone.includes(page)){
+                fusionnumber.push(b);
+            }
+            b++;
+        }
+
+        //Si la page est dans un tableau de fusion
+        var fusionnumberlength = fusionnumber.length;
+        if(fusionnumberlength !== 0){
+            //On parcourt le tableau de la page
+            for(let b = 0; b < fusionnumberlength;){
+                var fusiontabid = fusionnumber[b];
+                var idscriptfusion = idscriptsjsfusion[fusiontabid];
+                exportbalisespages[page].push(create_balise(idscriptfusion));
+
+                b++;
+            }
+        }
+        a++;
+    }
+
     console.log(scriptreplique);
     console.log(fusion);
     console.log(fusionpage);
+    console.log(exportbalisespages);
 }
