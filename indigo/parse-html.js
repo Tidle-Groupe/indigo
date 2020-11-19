@@ -1,6 +1,6 @@
 //Parsage du html pour récupérer les scripts js et css utilisés 
 //Script qui s'effectue une fois la compilation terminée, dans la partie js des assets
-htmlfunction get_scripts_js(page, page_name){
+function get_scripts_js(page, page_name){
     //Variables de bases
     var regex = /<script.*?src="(.*?)"><\/script>/gmi;
     var balisejs = [];
@@ -30,40 +30,18 @@ htmlfunction get_scripts_js(page, page_name){
     //Mise à zéro du tableau des balises script
     var balisejs = [];
 
-    var lengthsrcjs = srcjs.length;
-    //Boucle de récupération des éléments du tableau
-    var output = {};
-    for(let a = 0; a < lengthsrcjs;){
-        if(!output["scripts"]){
-            output["scripts"] = [];
-        }
-        output["scripts"].push(srcjs[a]);
-        a++;
-    }
-
-    //Ecriture d'un json pour écrire le résultat
-    var rjson = JSON.stringify(output);
-    fs.writeFileSync('./build_indigo_tmp/'+page_name+'.json', rjson, 'utf8');
-}
-
-function verif_script_niveau(ordre, ordre_array){
-    //On retire l'ordre sur la page actuelle pour comparer si une autre page appelle le script au même ordre
-    let jsfusionsretrait = ordre_array.splice(ordre, 1);
-
-    //On regarde si il existe un un autre élément sur le même ordre dans le tableau
-    if(jsfusionsretrait.includes(ordre)){
-        return true;
-    }else{
-        return false;
-    }
+    //Gestion du retour
+    return srcjs;
 }
 
 function html_parse_js(){
     //Récupération des routes du dossier à partir d'un tableau créer par le build site
     // build_route => donne la liste des routes, build_page[build_route]=> donne la liste des pages pour une route
 
-    //Création du dossier des tableaux de build
-    fs.mkdirsSync('./build_indigo_tmp/');
+    //Tableau de base
+    pagemap = [];
+    jsutilises = [];
+    pageutilises = [];
 
     //Vérification des fichiers js utilsiés par chaques pages
     //Récupération de la longueur des routes
@@ -76,9 +54,66 @@ function html_parse_js(){
             var page = build_page[build_route[a]][b];
             //Récupération de la page
             var page_r = fs.readFileSync('./'+dir_export+'/site/'+route+'/'+page, 'utf8');
-            get_scripts_js(page_r, route+'-'+page);
+            var get_scripts = get_scripts_js(page_r, route+'-'+page);
+
+            //Récupération du mappage
+            var lengthscript = get_scripts.length;
+            var pagenamearay = '/'+route+'/'+page;
+            //Boucle de récupération des éléments du tableau
+            for(let c = 0; c < lengthscript;){
+                //Mappage des éléments
+                var scriptjs = get_scripts[c];
+                if(!pagemap[pagenamearay]){
+                    pagemap[pagenamearay] = [];
+                }
+                pagemap[pagenamearay].push(scriptjs);
+                //Liste des js
+                if(!jsutilises.includes(scriptjs)){
+                    jsutilises.push(scriptjs);
+                }
+                //Liste des pages
+                if(!pageutilises.includes(pagenamearay)){
+                    pageutilises.push(pagenamearay);
+                }
+                c++;
+            }
+
             b++;
         }
         a++;
     }
+    console.log(pagemap);
+    console.log(jsutilises);
+
+    //Tableaux des ids pour chaques scripts
+    idscriptsjs = [];
+
+    //Assignation d'un id pour chaques scripts
+    var jsutiliseslength = jsutilises.length;
+    for(let a = 0; a < jsutiliseslength;){
+        var scriptname = jsutilises[a];
+        idscriptsjs[scriptname] = a;
+        a++;
+    }
+    console.log(idscriptsjs);
+
+    //Tableau pour le schéma d'ordre des pages
+    schemascripts = [];
+
+    //Création d'un schéma d'utilisation pour chaques pages
+    var pageutiliseslength = pageutilises.length;
+    for(let a = 0; a < pageutiliseslength;){
+        var page = pageutilises[a];
+        schemascripts[page] = [];
+        //On récupère les scripts de la page
+        var pagemaplength = pagemap[page].length;
+        for(let b = 0; b < pagemaplength;){
+            var script = pagemap[page][b];
+            var idscript = idscriptsjs[script];
+            schemascripts[page].push(idscript);
+            b++;
+        }
+        a++;
+    }
+    console.log(schemascripts);
 }
