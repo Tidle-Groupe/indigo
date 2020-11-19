@@ -222,6 +222,9 @@ function html_parse_js(){
                                     scriptreplique[page][scriptjs] = page_distante;
                                     var lastscriptjs = scriptjs;
                                 }
+                            }else{
+                                scriptreplique[page][scriptjs] = "";
+                                var lastscriptjs = scriptjs;
                             }
                         }
                     }
@@ -264,6 +267,19 @@ function html_parse_js(){
             //Si la page apparaît dans le tableau de fusion
             if(tabfusionone.includes(page)){
                 fusionnumber.push(b);
+
+                //On regarde sur chaques scripts de scriptreplique de la page
+                for(var key in scriptreplique[page]){
+                    //Si une clef de tableau correspond au contenu de script replique
+                    for(let c = 0; c < fusion[b].length;){
+                        if(key == fusion[b][c]){
+                            //On supprime la clef
+                            delete scriptreplique[page][key];
+                        }
+                        c++;
+                    }
+                }
+                
             }
             b++;
         }
@@ -280,6 +296,17 @@ function html_parse_js(){
                 b++;
             }
         }
+
+        //Récupération de scriptreplique de la page
+        if(scriptreplique[page]){
+            for(var key in scriptreplique[page]){
+                //Récupération de l'id du script
+                var idscript = idscriptsjs[key];
+                exportbalisespages[page].push(create_balise(idscript));
+                console.log(key);
+            }
+        }
+        
         a++;
     }
 
