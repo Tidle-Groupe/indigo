@@ -60,6 +60,22 @@ function mappage_pages(page, array_js){
     }
 }
 
+function export_map_add(page, script, id){
+    //On vérifie que la page n'est pas déjà déclarée
+    if(!array_export[page]){
+        array_export[page] = [];
+    }
+    array_export[page].push(id);
+    //On vérifie que le script n'est pas déjà déclaré
+    if(!array_export_js[script]){
+        array_export_js[script] = [];
+    }
+    //On vérfie que le l'id n'est pas déjà présent
+    if(!array_export_js[script].includes(id)){
+        array_export_js[script].push(id);
+    }
+}
+
 function html_parse_js(){
     //Récupération des routes du dossier à partir d'un tableau créer par le build site
     // build_route => donne la liste des routes, build_page[build_route]=> donne la liste des pages pour une route
@@ -74,6 +90,8 @@ function html_parse_js(){
     jslistfusions = [];
     scriptexportbalise = [];
     jsfusionsinter = [];
+    array_export = [];
+    array_export_js = [];
     var nextidscript = 0;
 
     //Vérification des fichiers js utilsiés par chaques pages
@@ -150,7 +168,6 @@ function html_parse_js(){
                 ordre_array.push(jsordre[scriptname][jsmap[scriptname][b]]);
                 b++;
             }
-            console.log(ordre_array);
             //Boucle pour chaques pages ou le fichier apparait
             /*for(let b = 0; b < jsmaplength;){
                 var page = jsmap[scriptname][b];
@@ -183,13 +200,18 @@ function html_parse_js(){
                 if(pages.length !== 1){
                     //On créer un tableau pour répertorier la fusion inter-pages
                     for(let c = 0; c < jsmaplength;){
-                        //On vérifie que le fichier n'est pas déjà présent
-                        if(!jsfusionsinter[scriptname].includes(pages[c])){
-                            jsfusionsinter[scriptname].push(pages[c]);
+                        //On vérifie que le fichier se trouve au même niveau sur la page
+                        if(ordre_execution == jsordre[scriptname][pages[c]]){
+                            if(!jsfusionsinter[scriptname][ordre_execution]){
+                                jsfusionsinter[scriptname][ordre_execution] = [];
+                            }
+                            //On vérifie que le fichier n'est pas déjà présent
+                            if(!jsfusionsinter[scriptname][ordre_execution].includes(pages[c])){
+                                jsfusionsinter[scriptname][ordre_execution].push(pages[c]);
+                            }
                         }
                         c++;
                     }
-                    console.log('Les pages '+pages+' inclues le script '+scriptname+' en plus de la page '+page);
                 }
 
                 b++;
@@ -201,5 +223,42 @@ function html_parse_js(){
         a++;
     }
 
-    console.log(jsfusionsinter);
+    //Attribution des id pour chaques scripts en fonction des fusions
+    //On parcourt chaques fichiers script
+    var jsuseslength = jsuses.length;
+    for(let a = 0; a < jsuseslength;){
+        var scriptname = jsuses[a];
+
+        //On vérifie si une fusion à était effectuer sur l'élément
+        if(jsfusionsinter[scriptname]){
+            //Boucle de fusion pour le script
+            for(let b = 0; b < jsfusionsinter[scriptname].length;){
+                //Si la liste d'export contient plusieurs pages
+                if(jsfusionsinter[scriptname][b].length !== 1){
+                    //On boucle les différentes pages
+                    for(let c = 0; c < jsfusionsinter[scriptname].length;){
+                        console.log('fusion effectuée pour '+jsfusionsinter[scriptname][b][c]+' script: '+scriptname);
+                        export_map_add(jsfusionsinter[scriptname][b][c], scriptname, nextidscript);
+                        c++;
+                    }
+                }else{
+                    console.log('fusion effectuée pour '+jsfusionsinter[scriptname][b]+' script: '+scriptname);
+                    export_map_add(jsfusionsinter[scriptname][b], scriptname, nextidscript);
+                    //On retire l'élément de la map d'export
+                }
+                b++;
+                nextidscript++;
+            }
+        }else{
+            //Si l'élément n'a pas était fusionné
+
+            nextidscript++;
+        }
+        
+
+        a++;
+    }
+
+    console.log(array_export);
+    console.log(array_export_js);
 }
