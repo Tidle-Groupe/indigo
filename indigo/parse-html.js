@@ -144,7 +144,7 @@ function html_parse_js(){
                         if(scripts_distantelength !== 0){
                             //Execution de la vérification si la page actuelle contient le script distant
                             if(scripts_distante.includes(scriptjs)){
-                                console.log(page_distante+' contient '+scriptjs);
+                                console.log(page+' : '+page_distante+' contient '+scriptjs);
                                 //On vérifie si les deux pages on déjà un autre script en commun
                                 if(array_page[page].includes(page_distante)){
                                     //Si l'élément d'avant se suit sur les deux pages
@@ -169,6 +169,11 @@ function html_parse_js(){
                                                         if(indexscriptjs == Number(indexlastscriptjs+1)){
                                                             console.log(lastscriptjs+' est déjà dans un tableau suivis par '+scriptjs);
                                                             var verifbouclefusion = true;
+                                                            //Si on ne trouve pas la page dans la liste des pages associées à la fusion
+                                                            if(!fusionpage[d].includes(page)){
+                                                                //On ajoute la page
+                                                                fusionpage[d].push(page);
+                                                            }
                                                         }
                                                     }
                                                 }
