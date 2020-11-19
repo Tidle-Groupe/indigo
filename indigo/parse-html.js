@@ -126,6 +126,20 @@ function html_parse_js(){
         for(let b = 0; b < schemascriptslength;){
             var id_script = schemascripts[page][b];
             console.log(id_script);
+
+            //Parcours des schémas des autres pages pour vérifier si un script est utiliser 
+            for(let c = 0; c < pageutiliseslength;){
+                var page_autre = pageutilises[c];
+                //On vérifie que ce ne soit pas la page actuel avant d'executer
+                if(page_autre !== page){
+                    //Si un autre schéma contient l'id script actuel
+                    if(schemascripts[page_autre].includes(id_script)){
+                        console.log("La page "+page_autre+" contient aussi l'id : "+id_script);
+                    }
+                }
+                c++;
+            }
+
             b++;
         }
         a++;
