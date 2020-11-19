@@ -128,5 +128,47 @@ function html_parse_js(){
         a++;
     }
 
+    //Gestion des fusions de fichiers de même niveau
+    //On parcourt chaques scripts déclarés
+    var jsuseslength = jsuses.length;
+    for(let a = 0; a < jsuseslength;){
+        var scriptname = jsuses[a];
+        ordre_array = [];
+        
+        //On regarde si le fichier apparaît sur plusieurs pages
+        var jsmaplength = jsmap[scriptname].length;
+        if(jsmaplength !== 1){
+            console.log(scriptname+' apparaît sur plusieurs pages');
+            //Boucle pour chaques pages ou le fichier apparait
+            jsmaplength = jsmap[scriptname].length;
+            for(let b = 0; b < jsmaplength;){
+                //On récupère tous les ordres du fichier sur chacunes des pages ou il apparait
+                ordre_array.push(jsordre[scriptname][jsmap[scriptname][b]]);
+                b++;
+            }
+            console.log(ordre_array);
+            //Boucle pour chaques pages ou le fichier apparait
+            for(let b = 0; b < jsmaplength;){
+                var page = jsmap[scriptname][b];
+                var ordre_execution = jsordre[scriptname][page];
+
+                //On retire l'ordre sur la page actuelle pour comparer si une autre page appelle le script au même ordre
+                let jsfusionsretrait = ordre_array.splice(ordre_execution, 1);
+
+                //On regarde si il existe un un autre élément sur le même ordre dans le tableau
+                if(jsfusionsretrait.includes(ordre_execution)){
+                    //On vérifie que la page n'est pas déjà incluse dans le tableau de fusion du script
+                    console.log('match !');
+                }
+                console.log(jsfusionsretrait);
+                console.log(ordre_execution);
+                
+                b++;
+            }
+            
+        }
+        a++;
+    }
+
     console.log(jsordre);
 }
