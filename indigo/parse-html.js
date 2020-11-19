@@ -61,7 +61,7 @@ function html_parse_js(){
             var pagenamearay = '/'+route+'/'+page;
             //Boucle de récupération des éléments du tableau
             for(let c = 0; c < lengthscript;){
-                //Mappage des éléments
+                //Mappage des éléments pages
                 var scriptjs = get_scripts[c];
                 if(!pagemap[pagenamearay]){
                     pagemap[pagenamearay] = [];
@@ -116,4 +116,18 @@ function html_parse_js(){
         a++;
     }
     console.log(schemascripts);
+    console.log("===");
+
+    //Parcours des schémas pour voir si il y a des correspondances
+    var pageutiliseslength = pageutilises.length;
+    for(let a = 0; a < pageutiliseslength;){
+        var page = pageutilises[a];
+        var schemascriptslength = schemascripts[page].length;
+        for(let b = 0; b < schemascriptslength;){
+            var id_script = schemascripts[page][b];
+            console.log(id_script);
+            b++;
+        }
+        a++;
+    }
 }
