@@ -73,6 +73,7 @@ function html_parse_js(){
     jsid = [];
     jslistfusions = [];
     scriptexportbalise = [];
+    jsfusionsinter = [];
     var nextidscript = 0;
 
     //Vérification des fichiers js utilsiés par chaques pages
@@ -138,6 +139,9 @@ function html_parse_js(){
         //On regarde si le fichier apparaît sur plusieurs pages
         var jsmaplength = jsmap[scriptname].length;
         if(jsmaplength !== 1){
+            if(!jsfusionsinter[scriptname]){
+                jsfusionsinter[scriptname] = [];
+            }
             console.log(scriptname+' apparaît sur plusieurs pages');
             //Boucle pour chaques pages ou le fichier apparait
             jsmaplength = jsmap[scriptname].length;
@@ -148,7 +152,7 @@ function html_parse_js(){
             }
             console.log(ordre_array);
             //Boucle pour chaques pages ou le fichier apparait
-            for(let b = 0; b < jsmaplength;){
+            /*for(let b = 0; b < jsmaplength;){
                 var page = jsmap[scriptname][b];
                 var ordre_execution = jsordre[scriptname][page];
 
@@ -164,11 +168,38 @@ function html_parse_js(){
                 console.log(ordre_execution);
                 
                 b++;
+            }*/
+            //On vérifie si deux scripts sont executés par les mêmes pages et dans le même ordre
+            //Boucle pour chaques pages ou le fichier apparait
+            console.log('=====');
+            for(let b = 0; b < jsmaplength;){
+                var page = jsmap[scriptname][b];
+                var ordre_execution = jsordre[scriptname][page];
+
+                //On récupère les pages ou sont executés les scripts
+                var pages = jsmap[scriptname];
+
+                //On regarde si le script est executer sur plusieurs pages
+                if(pages.length !== 1){
+                    //On créer un tableau pour répertorier la fusion inter-pages
+                    for(let c = 0; c < jsmaplength;){
+                        //On vérifie que le fichier n'est pas déjà présent
+                        if(!jsfusionsinter[scriptname].includes(pages[c])){
+                            jsfusionsinter[scriptname].push(pages[c]);
+                        }
+                        c++;
+                    }
+                    console.log('Les pages '+pages+' inclues le script '+scriptname+' en plus de la page '+page);
+                }
+
+                b++;
             }
-            
+        }else{
+            //Si le fichier n'apparaît que sur une page
+            console.log("single exec "+scriptname);
         }
         a++;
     }
 
-    console.log(jsordre);
+    console.log(jsfusionsinter);
 }
