@@ -118,50 +118,13 @@ function html_parse_js(){
     console.log(schemascripts);
     console.log("===");
 
-    //Tableau pour répertorier les pages utilisants les mêmes scripts
-    memescripts = [];
-
-    //Parcours des schémas pour voir si il y a des correspondances
+    //On regarde si une autre page utilise le même schéma
     var pageutiliseslength = pageutilises.length;
     for(let a = 0; a < pageutiliseslength;){
         var page = pageutilises[a];
-        var schemascriptslength = schemascripts[page].length;
-        for(let b = 0; b < schemascriptslength;){
-            var id_script = schemascripts[page][b];
-            var scriptname = jsutilises[b];
-            console.log(scriptname);
-
-            //Parcours des schémas des autres pages pour vérifier si un script est utiliser au même niveau
-            for(let c = 0; c < pageutiliseslength;){
-                var page_autre = pageutilises[c];
-                //On vérifie que ce ne soit pas la page actuel avant d'executer
-                if(page_autre !== page){
-                    //Si un autre schéma contient l'id script actuel
-                    if(schemascripts[page_autre].includes(id_script)){
-                        //Vérification que les éléménts soient au même niveau
-                        if(schemascripts[page_autre].indexOf(id_script) == schemascripts[page].indexOf(id_script)){
-                            //On vérifie que l'id du script d'output est égale à l'output de notre script
-                            var output_page_autre = schemascripts[page_autre][Number(schemascripts[page_autre].indexOf(id_script)+1)];
-                            var output_page = schemascripts[page][Number(schemascripts[page].indexOf(id_script)+1)];
-                            if(output_page_autre == output_page){
-                                console.log("L'output de "+page_autre+" est la même que "+page);
-                            }
-                            if(!memescripts[scriptname]){
-                                memescripts[scriptname] = [];
-                            }
-                            if(!memescripts[scriptname].includes(page_autre)){
-                                memescripts[scriptname].push(page_autre);
-                            }
-                            console.log("La page "+page_autre+" contient aussi l'id : "+id_script);
-                        }
-                    }
-                }
-                c++;
-            }
-
-            b++;
-        }
+        schemascripts[page] = [];
+        //On regarde si une une autre page possède 
         a++;
     }
-    console.log(memescripts);
+
 }
