@@ -97,34 +97,133 @@ function html_parse_js(){
     }
     console.log(idscriptsjs);
 
-    //Tableau pour le schéma d'ordre des pages
-    schemascripts = [];
-
-    //Création d'un schéma d'utilisation pour chaques pages
-    var pageutiliseslength = pageutilises.length;
-    for(let a = 0; a < pageutiliseslength;){
-        var page = pageutilises[a];
-        schemascripts[page] = [];
-        //On récupère les scripts de la page
-        var pagemaplength = pagemap[page].length;
-        for(let b = 0; b < pagemaplength;){
-            var script = pagemap[page][b];
-            var idscript = idscriptsjs[script];
-            schemascripts[page].push(idscript);
-            b++;
-        }
-        a++;
-    }
-    console.log(schemascripts);
     console.log("===");
 
-    //On regarde si une autre page utilise le même schéma
+    //Tableau de base
+    array_page = [];
+    scriptreplique = [];
+    fusion = [];
+    fusionpage = [];
+
+    //Variable de base
+    incrfusion = 0;
+
+    //On récupère une page
     var pageutiliseslength = pageutilises.length;
     for(let a = 0; a < pageutiliseslength;){
         var page = pageutilises[a];
-        schemascripts[page] = [];
-        //On regarde si une une autre page possède 
+        //On créer le tableau pour la page
+        array_page[page] = [];
+        scriptreplique[page] = [];
+        //On charge les scripts de cette page
+        var scripts = pagemap[page];
+
+        //Si la page possède des scripts
+        var scriptslength = scripts.length;
+        if(scriptslength !== 0){
+            //On récupère chaques scripts
+            for(let b = 0; b < scriptslength;){
+                var scriptjs = scripts[b];
+
+                //On récupère les scripts sur les autres pages
+                for(let c = 0; c < pageutiliseslength;){
+                    var page_distante = pageutilises[c];
+                    var scripts_distante = pagemap[page_distante];
+
+                    //On vérifie qu'il ne s'agisse pas de la même page
+                    if(page_distante !== page){
+                        
+                        //Si la page distante contient des scripts
+                        var scripts_distantelength = scripts_distante.length;
+                        if(scripts_distantelength !== 0){
+                            //Execution de la vérification si la page actuelle contient le script distant
+                            if(scripts_distante.includes(scriptjs)){
+                                console.log(page_distante+' contient '+scriptjs);
+                                //On vérifie si les deux pages on déjà un autre script en commun
+                                if(array_page[page].includes(page_distante)){
+                                    //Si l'élément d'avant se suit sur les deux pages
+                                    //On regarde si les deux éléments se suivent dans la page actuelle
+                                    if(scripts.indexOf(scriptjs) == Number(scripts.indexOf(lastscriptjs)+1)){
+                                        //On regarde si les deux éléments se suivent dans la page distante
+                                        if(scripts_distante.indexOf(scriptjs) == Number(scripts_distante.indexOf(lastscriptjs)+1)){
+                                            //Si les deux éléments se suivent sur les deux pages
+                                            var verifbouclefusion = false;
+
+                                            //On parcours tous le tableau des fusions
+                                            var fusionlength = fusion.length;
+                                            for(let d = 0; d < fusionlength;){
+                                                var tab_fusion = fusion[d];
+                                                //On vérifie si les deux éléments ne sont pas déjà dans un tableau
+                                                if(tab_fusion.includes(lastscriptjs)){
+                                                    var indexlastscriptjs = tab_fusion.indexOf(lastscriptjs);
+                                                    //On vérifie que le tableau inclus le script
+                                                    if(tab_fusion.includes(scriptjs)){
+                                                        var indexscriptjs = tab_fusion.indexOf(scriptjs);
+                                                        //On vérifie que le script suit l'ancien script dans le tableau
+                                                        if(indexscriptjs == Number(indexlastscriptjs+1)){
+                                                            console.log(lastscriptjs+' est déjà dans un tableau suivis par '+scriptjs);
+                                                            var verifbouclefusion = true;
+                                                        }
+                                                    }
+                                                }
+                                                d++;
+                                            }
+
+                                            //Si la vérification échoue
+                                            if(!verifbouclefusion){
+
+                                                //On regarde si le lastscriptjs existe en dernière position dans un tableau
+                                                //On parcours tous le tableau des fusions
+                                                var fusionlength = fusion.length;
+                                                for(let d = 0; d < fusionlength;){
+                                                    var tab_fusion = fusion[d];
+                                                    
+                                                    //Récupération du dernier élément du tableau et comparaison avec le lastjsscript
+                                                    var tabfusionlength = tab_fusion.length;
+                                                    if(tab_fusion[tabfusionlength] == lastscriptjs){
+                                                        fusion[tabfusionlength].push(scriptjs);
+                                                        fusionpage[incrfusion].push(page);
+                                                        var verifbouclefusion = true;
+                                                    }
+
+                                                    d++;
+                                                }
+
+                                                //Si la vérification échoue
+                                                if(!verifbouclefusion){
+                                                    fusion[incrfusion] = [lastscriptjs, scriptjs];
+                                                    fusionpage[incrfusion] = [page_distante, page];
+                                                    incrfusion++;
+                                                    console.log(lastscriptjs+' suit '+scriptjs+' dans '+page);
+                                                }
+                                            }
+
+                                        }else{
+                                            scriptreplique[page][scriptjs] = page_distante;
+                                            var lastscriptjs = scriptjs;
+                                        }
+                                    }else{
+                                        scriptreplique[page][scriptjs] = page_distante;
+                                        var lastscriptjs = scriptjs;
+                                    }
+                                }else{
+                                    array_page[page].push(page_distante);
+                                    scriptreplique[page][scriptjs] = page_distante;
+                                    var lastscriptjs = scriptjs;
+                                }
+                            }
+                        }
+                    }
+                    c++;
+                }
+                
+                b++;
+            }
+        }
+
         a++;
     }
-
+    console.log(scriptreplique);
+    console.log(fusion);
+    console.log(fusionpage);
 }
