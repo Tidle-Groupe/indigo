@@ -303,10 +303,10 @@ function build_assets(build, bib_js){
             a++;
         }
     }
+    //js_replace('');
     //Parsage du html pour récupérer les éléments js utilisés
     eval(fs.readFileSync(__dirname + "/parse-html.js")+'');
     html_parse_js();
-    js_replace('');
 }
 function build_api(build){
     //Gestion de la partie api

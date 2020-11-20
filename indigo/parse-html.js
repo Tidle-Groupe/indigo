@@ -54,6 +54,26 @@ function rewrite_balise_js(scripts, pagerepertory){
     fs.writeFileSync(pagerepertory, page, 'utf8');
 }
 
+function recup_script_origin(path){
+    if(fs.pathExistsSync(path)){
+        var content = fs.readFileSync(path, 'utf8');
+        return content;
+    }else{
+        return "";
+    }
+}
+
+function rewrite_script_js(scriptid, content){
+    //Réecriture du fichier
+    fs.writeFileSync('./'+dir_export+'/assets/js/'+scriptid+'.js', content, 'utf8');
+    //Minify du js
+    minify({
+        compressor: uglifyES,
+        input: './'+dir_export+'/assets/js/'+scriptid+'.js',
+        output: './'+dir_export+'/assets/js/'+scriptid+'.js'
+    });
+}
+
 function html_parse_js(){
     //Récupération des routes du dossier à partir d'un tableau créer par le build site
     // build_route => donne la liste des routes, build_page[build_route]=> donne la liste des pages pour une route
@@ -330,6 +350,9 @@ function html_parse_js(){
     //Tableau d'export final
     var exportfinal = [];
 
+    //Tableau pour contenir la liste des scripts seuls utlisés
+    var scriptssolouse = [];
+
     //On remet les scripts dans l'ordre d'apparition sur chaques pages
     //On récupère une page
     var pageutiliseslength = pageutilises.length;
@@ -379,6 +402,10 @@ function html_parse_js(){
 
                 //On execute si le script n'est pas une fusion
                 if(!scriptverif){
+                    //On ajoute le script dans la liste des fichiers scripts non fusionnés si pas déjà présent
+                    if(!scriptssolouse.includes(script)){
+                        scriptssolouse.push(script);
+                    }
                     //On récupère l'ordre du script dans la page d'origine
                     var ordrepageorigine = pagemap[page].indexOf(script);
                     //On récupère l'id du script
@@ -411,6 +438,40 @@ function html_parse_js(){
         rewrite_balise_js(baliseexport, './'+dir_export+'/site'+page);
         console.log(baliseexport);
 
+        a++;
+    }
+
+    //Réecriture des scripts js non fusionnés
+    //On récupère la liste des scripts js utilisés seuls
+    var scriptssolouselength = scriptssolouse.length;
+    for(let a = 0; a < scriptssolouselength;){
+        var scriptname = scriptssolouse[a];
+        var idscript = idscriptsjs[scriptname];
+        //On récupère le script d'origine
+        var content = recup_script_origin('./sources/assets'+scriptname);
+        //On réecrit le script
+        rewrite_script_js(idscript, content);
+
+        a++;
+    }
+
+    //Réecriture des scripts js fusionnés
+    var fusionlength = fusion.length;
+    for(let a = 0; a < fusionlength;){
+        var fusiontab = fusion[a];
+        var content = "";
+        //On récupère l'id de cette fusion
+        var idscriptfusion = idscriptsjsfusion[a];
+        //On récupère le contenu de chaques scripts
+        var fusiontablength = fusiontab.length;
+        for(let b = 0; b < fusiontablength;){
+            var fusiontabelement = fusiontab[b];
+            var content = content+recup_script_origin('./sources/assets'+fusiontabelement);
+            b++;
+        }
+        //On réecrit le script
+        rewrite_script_js(idscriptfusion, content);
+        
         a++;
     }
 
