@@ -2,7 +2,7 @@
 //Script qui s'effectue une fois la compilation terminée, dans la partie js des assets
 function get_scripts_js(page){
     //Variables de bases
-    var regex = /<script.*?src="(.*?)"><\/script>/gmi;
+    var regex = /<script.*?src="https:\/\/assets.exemple.fr(.*?)"><\/script>/gmi;
     var balisejs = [];
     var srcjs = [];
 
@@ -251,13 +251,14 @@ function html_parse_js(){
 
     //Tableau des balises d'export
     var exportbalisespages = [];
+    var fusionnumber = [];
 
     //Création des balises de scripts pour chaques pages
     //On récupère une page
     var pageutiliseslength = pageutilises.length;
     for(let a = 0; a < pageutiliseslength;){
         var page = pageutilises[a];
-        var fusionnumber = [];
+        fusionnumber[page] = [];
         exportbalisespages[page] = [];
         
         //On regarde si la page apparaît dans un tableau de fusion
@@ -266,7 +267,7 @@ function html_parse_js(){
             var tabfusionone = fusionpage[b];
             //Si la page apparaît dans le tableau de fusion
             if(tabfusionone.includes(page)){
-                fusionnumber.push(b);
+                fusionnumber[page].push(b);
 
                 //On regarde sur chaques scripts de scriptreplique de la page
                 for(var key in scriptreplique[page]){
@@ -285,13 +286,13 @@ function html_parse_js(){
         }
 
         //Si la page est dans un tableau de fusion
-        var fusionnumberlength = fusionnumber.length;
+        var fusionnumberlength = fusionnumber[page].length;
         if(fusionnumberlength !== 0){
             //On parcourt le tableau de la page
             for(let b = 0; b < fusionnumberlength;){
-                var fusiontabid = fusionnumber[b];
+                var fusiontabid = fusionnumber[page][b];
                 var idscriptfusion = idscriptsjsfusion[fusiontabid];
-                exportbalisespages[page].push(create_balise(idscriptfusion));
+                exportbalisespages[page].push(idscriptfusion);
 
                 b++;
             }
@@ -302,7 +303,7 @@ function html_parse_js(){
             for(var key in scriptreplique[page]){
                 //Récupération de l'id du script
                 var idscript = idscriptsjs[key];
-                exportbalisespages[page].push(create_balise(idscript));
+                exportbalisespages[page].push(idscript);
                 console.log(key);
             }
         }
@@ -310,8 +311,74 @@ function html_parse_js(){
         a++;
     }
 
+    //Tableau d'export final
+    var exportfinal = [];
+
+    //On remet les scripts dans l'ordre d'apparition sur chaques pages
+    //On récupère une page
+    var pageutiliseslength = pageutilises.length;
+    for(let a = 0; a < pageutiliseslength;){
+        var page = pageutilises[a];
+        exportfinal[page] = [];
+        var pageidfusion = [];
+        //On boucle les scripts appelés par la page dans l'ordre
+        var pagemaplength = pagemap[page].length;
+        for(let b = 0; b < pagemaplength;){
+            var script = pagemap[page][b];
+            var scriptverif = false;
+
+            //On vérifie que le script ne fait pas partis d'une liste de fusion déjà vérifiée
+            var pageidfusionlength = pageidfusion.length;
+            for(let c = 0; c < pageidfusionlength;){
+                var pageidfusionnumber = pageidfusion[c];
+                var fusionverif = fusion[pageidfusionnumber];
+                //Si une liste de fusion déjà déclarée contient le script
+                if(fusionverif.includes(script)){
+                    var scriptverif = true;
+                }
+                c++;
+            }
+
+            //Si la vérification échoue
+            if(!scriptverif){
+                //On regarde si le script est une fusion pour la page
+                //On regarde si la liste des pages faisant appel à la fusion contient notre page actuelle
+                var idfusionpage = fusionnumber[page][0];
+                if(fusionpage[idfusionpage].includes(page)){
+                    //On regarde si le script actuel est une fusion pour le même id
+                    if(fusion[idfusionpage].includes(script)){
+                        //On ajoute l'id de fusion à la liste pour ne plus vérifier ses scripts sur la page
+                        pageidfusion.push(idfusionpage);
+                        var scriptverif = true;
+                        //On récupère l'ordre du script sur la page d'origine
+                        var ordrepageorigine = pagemap[page].indexOf(script);
+                        //On récupère l'id du script de fusion
+                        var idscriptfusion = idscriptsjsfusion[idfusionpage];
+                        //On envois le script dans le tableau d'export à la même place que dans le script d'origine
+                        exportfinal[page].splice(ordrepageorigine, 0, idscriptfusion);
+                    }
+                }
+
+                //On execute si le script n'est pas une fusion
+                if(!scriptverif){
+                    //On récupère l'ordre du script dans la page d'origine
+                    var ordrepageorigine = pagemap[page].indexOf(script);
+                    //On récupère l'id du script
+                    var idscript = idscriptsjs[script];
+                    //On envois le script dans le tableau d'export à la même place que dans le script d'origine
+                    exportfinal[page].splice(ordrepageorigine, 0, idscript);
+                }
+            }
+
+            b++;
+        }
+        a++;
+    }
+
+    //Export des balises dans l'ordre pour chaques pages
+
     console.log(scriptreplique);
     console.log(fusion);
     console.log(fusionpage);
-    console.log(exportbalisespages);
+    console.log(exportfinal);
 }
