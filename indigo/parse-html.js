@@ -226,10 +226,19 @@ function html_parse_js(){
                                                     var tab_fusion = fusion[d];
                                                     
                                                     //Récupération du dernier élément du tableau et comparaison avec le lastjsscript
-                                                    var tabfusionlength = tab_fusion.length;
+                                                    var tabfusionlength = Number(tab_fusion.length-1);
+                                                    //Si le dernier élément du tableau est égal au script précédent
                                                     if(tab_fusion[tabfusionlength] == lastscriptjs){
-                                                        fusion[tabfusionlength].push(scriptjs);
-                                                        fusionpage[incrfusion].push(page);
+                                                        //On ajoute le script à la fusion si il n'est pas déjà dedans
+                                                        if(!tab_fusion.includes(scriptjs)){
+                                                            //On ajoute la fusion
+                                                            tab_fusion.push(scriptjs);
+                                                        }
+                                                        //On ajoute le script à la fusion page si pas déjà présent
+                                                        if(!fusionpage[d].includes(page)){
+                                                            //On ajoute la fusion
+                                                            fusionpage[d].push(page);
+                                                        }
                                                         var verifbouclefusion = true;
                                                     }
 
@@ -244,7 +253,8 @@ function html_parse_js(){
                                                     console.log(lastscriptjs+' suit '+scriptjs+' dans '+page);
                                                 }
                                             }
-
+                                            //Dans tous les cas on ajoute le script actuel à la var lastscript
+                                            var lastscriptjs = scriptjs;
                                         }else{
                                             scriptreplique[page][scriptjs] = page_distante;
                                             var lastscriptjs = scriptjs;
