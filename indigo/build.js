@@ -150,7 +150,7 @@ function build_site(build){
                             var page_r = pars_po(page_r, routes[a]);
 
                             //Ajout de la bibliothèque de scripts js
-                            if(page_r.search("<indigo-js></indigo-js>")){
+                            if(page_r.includes("<indigo-js></indigo-js>")){
                                 //pour le retour de la création de la bibliothèque dans la section assets
                                 var bib_js_w = true;
 
@@ -226,7 +226,7 @@ function build_assets(build, bib_js){
         //Changement des domaines du site pour le cookie secure
         if(domaine_site.startsWith('https://')){
             //Remplacement du secure cookie
-            var js_r = replaceAll("function cookieAPI(c,e,o){document.cookie=\"c_check=\"+c+\"; expires=\"+e+\"; path=\"+o}", "function cookieAPI(c,e,o){document.cookie=\"c_check=\"+c+\"; expires=\"+e+\"; Secure; path=\"+o}", js_r);
+            var js_r = replaceAll("function cookieAPI(c,e,o){document.cookie=c+\"; expires=\"+e+\"; path=\"+o}", "function cookieAPI(c,e,o){document.cookie=c+\"; expires=\"+e+\"; Secure; path=\"+o}", js_r);
         }
         
         //Création du dossier d'export
@@ -287,11 +287,6 @@ function build_assets(build, bib_js){
                         var content_js = replace_domaines(content_js);
                         //Réecriture du fichier
                         fs.writeFileSync('./'+dir_export+'/assets/js/'+d+assets_js[a], content_js, 'utf8');
-                        minify({
-                            compressor: uglifyES,
-                            input: './'+dir_export+'/assets/js/'+d+assets_js[a],
-                            output: './'+dir_export+'/assets/js/'+d+assets_js[a]
-                        });
                     }
                 }
 
@@ -303,10 +298,30 @@ function build_assets(build, bib_js){
             a++;
         }
     }
-    //js_replace('');
+    js_replace('');
     //Parsage du html pour récupérer les éléments js utilisés
     eval(fs.readFileSync(__dirname + "/parse-html.js")+'');
-    html_parse_js();
+    //On supprime l'ancien répertoire js_tp si existe
+    if(fs.pathExistsSync('./'+dir_export+'/assets/js_tmp/')){
+        fs.removeSync('./'+dir_export+'/assets/js_tmp/');
+    }
+    //On boucle le parse pour chaques routes
+    var lengthroutes = build_route.length;
+    for(let a = 0; a < lengthroutes;){
+        html_parse_js(build_route[a]);
+        a++;
+    }
+    //Si le répertoire js_tp existe
+    if(fs.pathExistsSync('./'+dir_export+'/assets/js_tmp/')){
+        //On supprime le répertoire js
+        fs.removeSync('./'+dir_export+'/assets/js/');
+        //On le récréer
+        fs.mkdirsSync('./'+dir_export+'/assets/js/');
+        //On déplace tous le répertoire js_tmp vers js
+        fs.copySync('./'+dir_export+'/assets/js_tmp/', './'+dir_export+'/assets/js/');
+        //On supprime le répertoire js_tmp
+        fs.removeSync('./'+dir_export+'/assets/js_tmp/');
+    }
 }
 function build_api(build){
     //Gestion de la partie api

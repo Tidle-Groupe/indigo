@@ -1,1 +1,1 @@
-function cookieAPI(c,e,o){document.cookie="c_check="+c+"; expires="+e+"; path="+o}
+function cookieAPI(c,e,o){document.cookie=c+"; expires="+e+"; path="+o}
