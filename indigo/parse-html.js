@@ -1,8 +1,8 @@
 //Parsage du html pour récupérer les scripts js et css utilisés 
 //Script qui s'effectue une fois la compilation terminée, dans la partie js des assets
-function get_scripts_js(page){
+function get_scripts_js(page, pagerepertory){
     //Variables de bases
-    var regex = /<script.*?src="https:\/\/assets.exemple.fr(.*?)"><\/script>/gmi;
+    var regex = /<script.*?src="(.*?)"><\/script>/gmi;
     var balisejs = [];
     var srcjs = [];
 
@@ -14,19 +14,26 @@ function get_scripts_js(page){
         //Vérification qu'il s'agit d'une balise script src
         var src = regex.exec(page);
         if(src){
-            //Ajout de la balise dans un tableau
-            balisejs.push(src[0]);
-            //Ajout de la source dans un tableau
-            srcjs.push(src[1].replace(domaine_assets, ''));
+            //Vérification qu'il s'agisse d'une balise src sur le domaine des assets
+            var verif = src[0].indexOf(domaine_assets+"/");
+            if(verif > -1){
+                //Ajout de la balise dans un tableau
+                balisejs.push(src[0]);
+                //Ajout de la source dans un tableau
+                srcjs.push(src[1].replace(domaine_assets, ''));
+            }
         }
         a++;
     }
     //Boucle de retrait des balsies scripts de la page
-    for(let a = 0; a < scriptlength;){
+    var srcjslength = srcjs.length;
+    for(let a = 0; a < srcjslength;){
         //Retrait de la balise script de la page
         var page = page.replace(balisejs[a], '');
         a++;
     }
+    //Réecriture de la page sans les balises
+    fs.writeFileSync(pagerepertory, page, 'utf8');
     //Mise à zéro du tableau des balises script
     var balisejs = [];
 
@@ -36,6 +43,15 @@ function get_scripts_js(page){
 
 function create_balise(idscript){
     return "<script src=\""+domaine_assets+"/js/"+idscript+".js\"></script>";
+}
+
+function rewrite_balise_js(scripts, pagerepertory){
+    //Récupération de la page
+    var page = fs.readFileSync(pagerepertory, 'utf8');
+    //Ajout des balises à la fin du document
+    var page = page.replace('</body>', scripts+'</body>');
+    //Réecriture du fichier
+    fs.writeFileSync(pagerepertory, page, 'utf8');
 }
 
 function html_parse_js(){
@@ -58,7 +74,7 @@ function html_parse_js(){
             var page = build_page[build_route[a]][b];
             //Récupération de la page
             var page_r = fs.readFileSync('./'+dir_export+'/site/'+route+'/'+page, 'utf8');
-            var get_scripts = get_scripts_js(page_r);
+            var get_scripts = get_scripts_js(page_r, './'+dir_export+'/site/'+route+'/'+page);
 
             //Récupération du mappage
             var lengthscript = get_scripts.length;
@@ -344,18 +360,20 @@ function html_parse_js(){
                 //On regarde si le script est une fusion pour la page
                 //On regarde si la liste des pages faisant appel à la fusion contient notre page actuelle
                 var idfusionpage = fusionnumber[page][0];
-                if(fusionpage[idfusionpage].includes(page)){
-                    //On regarde si le script actuel est une fusion pour le même id
-                    if(fusion[idfusionpage].includes(script)){
-                        //On ajoute l'id de fusion à la liste pour ne plus vérifier ses scripts sur la page
-                        pageidfusion.push(idfusionpage);
-                        var scriptverif = true;
-                        //On récupère l'ordre du script sur la page d'origine
-                        var ordrepageorigine = pagemap[page].indexOf(script);
-                        //On récupère l'id du script de fusion
-                        var idscriptfusion = idscriptsjsfusion[idfusionpage];
-                        //On envois le script dans le tableau d'export à la même place que dans le script d'origine
-                        exportfinal[page].splice(ordrepageorigine, 0, idscriptfusion);
+                if(idfusionpage >= 0){
+                    if(fusionpage[idfusionpage].includes(page)){
+                        //On regarde si le script actuel est une fusion pour le même id
+                        if(fusion[idfusionpage].includes(script)){
+                            //On ajoute l'id de fusion à la liste pour ne plus vérifier ses scripts sur la page
+                            pageidfusion.push(idfusionpage);
+                            var scriptverif = true;
+                            //On récupère l'ordre du script sur la page d'origine
+                            var ordrepageorigine = pagemap[page].indexOf(script);
+                            //On récupère l'id du script de fusion
+                            var idscriptfusion = idscriptsjsfusion[idfusionpage];
+                            //On envois le script dans le tableau d'export à la même place que dans le script d'origine
+                            exportfinal[page].splice(ordrepageorigine, 0, idscriptfusion);
+                        }
                     }
                 }
 
@@ -375,10 +393,28 @@ function html_parse_js(){
         a++;
     }
 
-    //Export des balises dans l'ordre pour chaques pages
+    //Export des balises pour chaques pages
+    //On récupère une page
+    var pageutiliseslength = pageutilises.length;
+    for(let a = 0; a < pageutiliseslength;){
+        var page = pageutilises[a];
+        console.log(page+':');
+        var baliseexport = "";
+        //On récupère la liste des exports finale de la page
+        var exportfinallength = exportfinal[page].length;
+        for(let b = 0; b < exportfinallength;){
+            var scriptidpage = exportfinal[page][b];
+            var baliseexport = baliseexport+create_balise(scriptidpage);
+            b++;
+        }
+        //Réecriture de la balise pour la page
+        rewrite_balise_js(baliseexport, './'+dir_export+'/site'+page);
+        console.log(baliseexport);
+
+        a++;
+    }
 
     console.log(scriptreplique);
     console.log(fusion);
     console.log(fusionpage);
-    console.log(exportfinal);
 }
