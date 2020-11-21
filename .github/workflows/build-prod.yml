@@ -5,9 +5,9 @@ name: Build Prod Test
 
 on:
   push:
-    branches: INDIGO-V1
+    branches: [INDIGO-V1]
   pull_request:
-    branches: INDIGO-V1
+    branches: [INDIGO-V1]
     
 jobs:
   build:
