@@ -264,7 +264,10 @@ function build_assets(build, bib_js){
             a++;
         }
     }
-    css_replace('');
+    //On vérifie que le répertoire css source existe
+    if(fs.pathExistsSync('./sources/assets/css/')){
+        css_replace('');
+    }
 
     //JS
     function js_replace(d) {
@@ -298,30 +301,33 @@ function build_assets(build, bib_js){
             a++;
         }
     }
-    js_replace('');
-    //Parsage du html pour récupérer les éléments js utilisés
-    eval(fs.readFileSync(__dirname + "/parse-html.js")+'');
-    //On supprime l'ancien répertoire js_tp si existe
-    if(fs.pathExistsSync('./'+dir_export+'/assets/js_tmp/')){
-        fs.removeSync('./'+dir_export+'/assets/js_tmp/');
-    }
-    //On boucle le parse pour chaques routes
-    var lengthroutes = build_route.length;
-    for(let a = 0; a < lengthroutes;){
-        console.log("Export des js pour la route "+build_route[a]);
-        html_parse_js(build_route[a]);
-        a++;
-    }
-    //Si le répertoire js_tp existe
-    if(fs.pathExistsSync('./'+dir_export+'/assets/js_tmp/')){
-        //On supprime le répertoire js
-        fs.removeSync('./'+dir_export+'/assets/js/');
-        //On le récréer
-        fs.mkdirsSync('./'+dir_export+'/assets/js/');
-        //On déplace tous le répertoire js_tmp vers js
-        fs.copySync('./'+dir_export+'/assets/js_tmp/', './'+dir_export+'/assets/js/');
-        //On supprime le répertoire js_tmp
-        fs.removeSync('./'+dir_export+'/assets/js_tmp/');
+    //On vérifie que le répertoire css source existe
+    if(fs.pathExistsSync('./sources/assets/js/')){
+        js_replace('');
+        //Parsage du html pour récupérer les éléments js utilisés
+        eval(fs.readFileSync(__dirname + "/parse-html.js")+'');
+        //On supprime l'ancien répertoire js_tp si existe
+        if(fs.pathExistsSync('./'+dir_export+'/assets/js_tmp/')){
+            fs.removeSync('./'+dir_export+'/assets/js_tmp/');
+        }
+        //On boucle le parse pour chaques routes
+        var lengthroutes = build_route.length;
+        for(let a = 0; a < lengthroutes;){
+            console.log("Export des js pour la route "+build_route[a]);
+            html_parse_js(build_route[a]);
+            a++;
+        }
+        //Si le répertoire js_tmp existe
+        if(fs.pathExistsSync('./'+dir_export+'/assets/js_tmp/')){
+            //On supprime le répertoire js
+            fs.removeSync('./'+dir_export+'/assets/js/');
+            //On le récréer
+            fs.mkdirsSync('./'+dir_export+'/assets/js/');
+            //On déplace tous le répertoire js_tmp vers js
+            fs.copySync('./'+dir_export+'/assets/js_tmp/', './'+dir_export+'/assets/js/');
+            //On supprime le répertoire js_tmp
+            fs.removeSync('./'+dir_export+'/assets/js_tmp/');
+        }
     }
 }
 function build_api(build){
