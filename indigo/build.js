@@ -240,24 +240,24 @@ function build_assets(build, bib_js){
         //Création du répertoire
         fs.mkdirsSync('./'+dir_export+'/assets/css/'+d);
         //Détection des fichiers css présents
-        var assets_css = fs.readdirSync('../sources/assets/css/'+d);
+        var assets_css = fs.readdirSync('./sources/assets/css/'+d);
         var lengthcss = assets_css.length;
         for(let a = 0; a < lengthcss;){
             //Vérification que l'élément existe
-            if(fs.pathExistsSync('../sources/assets/css/'+d+assets_css[a])){
+            if(fs.pathExistsSync('./sources/assets/css/'+d+assets_css[a])){
                 //Si c'est un fichier
-                if(fs.lstatSync('../sources/assets/css/'+d+assets_css[a]).isFile()){
+                if(fs.lstatSync('./sources/assets/css/'+d+assets_css[a]).isFile()){
                     if(get_extension(assets_css[a]) == "css"){
                         minify({
                             compressor: csso,
-                            input: '../sources/assets/css/'+d+assets_css[a],
-                            output: '../'+dir_export+'/assets/css/'+d+assets_css[a]
+                            input: './sources/assets/css/'+d+assets_css[a],
+                            output: './'+dir_export+'/assets/css/'+d+assets_css[a]
                         });
                     }
                 }
 
                 //Si c'est un répertoire
-                if(fs.lstatSync('../sources/assets/css/'+d+assets_css[a]).isDirectory()){
+                if(fs.lstatSync('./sources/assets/css/'+d+assets_css[a]).isDirectory()){
                     css_replace(d+assets_css[a]+'/');
                 }
             }
