@@ -6,6 +6,7 @@
 # https://github.com/anchore/grype
 name: Anchore Container Scan
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 0 */10 * *'
 
