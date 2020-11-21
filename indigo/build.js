@@ -248,11 +248,8 @@ function build_assets(build, bib_js){
                 //Si c'est un fichier
                 if(fs.lstatSync('./sources/assets/css/'+d+assets_css[a]).isFile()){
                     if(get_extension(assets_css[a]) == "css"){
-                        minify({
-                            compressor: csso,
-                            input: './sources/assets/css/'+d+assets_css[a],
-                            output: './'+dir_export+'/assets/css/'+d+assets_css[a]
-                        });
+                        //Déplacement du fichier
+                        fs.copySync('./sources/assets/css/'+d+assets_css[a], './'+dir_export+'/assets/css/'+d+assets_css[a]);
                     }
                 }
 
@@ -267,6 +264,30 @@ function build_assets(build, bib_js){
     //On vérifie que le répertoire css source existe
     if(fs.pathExistsSync('./sources/assets/css/')){
         css_replace('');
+        //Parsage du html pour récupérer les éléments css utilisés
+        eval(fs.readFileSync(__dirname + "/parse-html.js")+'');
+        //On supprime l'ancien répertoire css_tmp si existe
+        if(fs.pathExistsSync('./'+dir_export+'/assets/css_tmp/')){
+            fs.removeSync('./'+dir_export+'/assets/css_tmp/');
+        }
+        //On boucle le parse pour chaques routes
+        var lengthroutes = build_route.length;
+        for(let a = 0; a < lengthroutes;){
+            console.log("Export des css pour la route "+build_route[a]);
+            scripts_bundler("css", build_route[a]);
+            a++;
+        }
+        //Si le répertoire css_tmp existe
+        if(fs.pathExistsSync('./'+dir_export+'/assets/css_tmp/')){
+            //On supprime le répertoire css
+            fs.removeSync('./'+dir_export+'/assets/css/');
+            //On le récréer
+            fs.mkdirsSync('./'+dir_export+'/assets/css/');
+            //On déplace tous le répertoire css_tmp vers css
+            fs.copySync('./'+dir_export+'/assets/css_tmp/', './'+dir_export+'/assets/css/');
+            //On supprime le répertoire css_tmp
+            fs.removeSync('./'+dir_export+'/assets/css_tmp/');
+        }
     }
 
     //JS
@@ -306,7 +327,7 @@ function build_assets(build, bib_js){
         js_replace('');
         //Parsage du html pour récupérer les éléments js utilisés
         eval(fs.readFileSync(__dirname + "/parse-html.js")+'');
-        //On supprime l'ancien répertoire js_tp si existe
+        //On supprime l'ancien répertoire js_tmp si existe
         if(fs.pathExistsSync('./'+dir_export+'/assets/js_tmp/')){
             fs.removeSync('./'+dir_export+'/assets/js_tmp/');
         }

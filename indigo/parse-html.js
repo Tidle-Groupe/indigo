@@ -1,8 +1,8 @@
 //Parsage du html pour récupérer les scripts js et css utilisés 
-//Script qui s'effectue une fois la compilation terminée, dans la partie js des assets
+//Script qui s'effectue une fois la compilation terminée, dans la partie des assets
 function get_scripts_js(page, pagerepertory){
     //Variables de bases
-    var regex = /<script.*?src="(.*?)"><\/script>/gmi;
+    var regex = /<script.*?src="(.*?).js"><\/script>/gmi;
     var balisejs = [];
     var srcjs = [];
 
@@ -41,8 +41,52 @@ function get_scripts_js(page, pagerepertory){
     return srcjs;
 }
 
+function get_scripts_css(page, pagerepertory){
+    //Variables de bases
+    var regex = /<link.*?href="(.*?).css">/gmi;
+    var balisecss = [];
+    var srccss = [];
+
+    //Récupération du nombre de balises scripts
+    var splitscriptend = page.split('<link');
+    var scriptlength = Number(splitscriptend.length-1);
+    //Boucle de récupération pour chaques balises script
+    for(let a = 0; a < scriptlength;){
+        //Vérification qu'il s'agit d'une balise script src
+        var src = regex.exec(page);
+        if(src){
+            //Vérification qu'il s'agisse d'une balise src sur le domaine des assets
+            var verif = src[0].indexOf(domaine_assets+"/");
+            if(verif > -1){
+                //Ajout de la balise dans un tableau
+                balisecss.push(src[0]);
+                //Ajout de la source dans un tableau
+                srccss.push(src[1].replace(domaine_assets, ''));
+            }
+        }
+        a++;
+    }
+    //Boucle de retrait des balsies scripts de la page
+    var srccsslength = srccss.length;
+    for(let a = 0; a < srccsslength;){
+        //Retrait de la balise script de la page
+        var page = page.replace(balisecss[a], '');
+        a++;
+    }
+    //Réecriture de la page sans les balises
+    fs.writeFileSync(pagerepertory, page, 'utf8');
+    //Mise à zéro du tableau des balises script
+    var balisecss = [];
+
+    //Gestion du retour
+    return srccss;
+}
+
 function create_balise_js(idscript, route){
     return "<script src=\""+domaine_assets+"/js/"+route+"/"+idscript+".js\"></script>";
+}
+function create_balise_css(idscript, route){
+    return "<link rel=\"stylesheet\" href=\""+domaine_assets+"/js/"+route+"/"+idscript+".css\">";
 }
 
 function rewrite_balise_js(scripts, pagerepertory){
@@ -50,6 +94,15 @@ function rewrite_balise_js(scripts, pagerepertory){
     var page = fs.readFileSync(pagerepertory, 'utf8');
     //Ajout des balises à la fin du document
     var page = page.replace('</body>', scripts+'</body>');
+    //Réecriture du fichier
+    fs.writeFileSync(pagerepertory, page, 'utf8');
+}
+
+function rewrite_balise_css(scripts, pagerepertory){
+    //Récupération de la page
+    var page = fs.readFileSync(pagerepertory, 'utf8');
+    //Ajout des balises à la fin du document
+    var page = page.replace('</head>', scripts+'</head>');
     //Réecriture du fichier
     fs.writeFileSync(pagerepertory, page, 'utf8');
 }
@@ -71,6 +124,14 @@ function rewrite_script(type, scriptid, content, route){
         //Minify du js
         minify({
             compressor: uglifyES,
+            input: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type,
+            output: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type
+        });
+    }
+    if(type == "css"){
+        //Minify du js
+        minify({
+            compressor: csso,
             input: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type,
             output: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type
         });
@@ -97,6 +158,10 @@ function scripts_bundler(type, routeactive){
         //Si c'est un js
         if(type == "js"){
             var get_scripts = get_scripts_js(page_r, './'+dir_export+'/site/'+routeactive+'/'+page);
+        }
+        //Si c'est un css
+        if(type == "css"){
+            var get_scripts = get_scripts_css(page_r, './'+dir_export+'/site/'+routeactive+'/'+page);
         }
 
         //Récupération du mappage
@@ -472,12 +537,20 @@ function scripts_bundler(type, routeactive){
                 if(type == "js"){
                     var baliseexport = baliseexport+create_balise_js(scriptidpage, routeactive);
                 }
+                //Si c'est un css
+                if(type == "css"){
+                    var baliseexport = baliseexport+create_balise_css(scriptidpage, routeactive);
+                }
                 b++;
             }
             //Réecriture de la balise pour la page
             //Si c'est un js
             if(type == "js"){
                 rewrite_balise_js(baliseexport, './'+dir_export+'/site'+page);
+            }
+            //Si c'est un css
+            if(type == "css"){
+                rewrite_balise_css(baliseexport, './'+dir_export+'/site'+page);
             }
             //console.log(baliseexport);
 
@@ -491,7 +564,7 @@ function scripts_bundler(type, routeactive){
             var scriptname = scriptssolouse[a];
             var idscript = idscriptstype[scriptname];
             //On récupère le script d'origine
-            var content = recup_script_origin('./'+dir_export+'/assets'+scriptname);
+            var content = recup_script_origin('./'+dir_export+'/assets'+scriptname+'.'+type);
             //On réecrit le script
             rewrite_script(type, idscript, content, routeactive);
 
@@ -509,7 +582,7 @@ function scripts_bundler(type, routeactive){
             var fusiontablength = fusiontab.length;
             for(let b = 0; b < fusiontablength;){
                 var fusiontabelement = fusiontab[b];
-                var content = content+recup_script_origin('./'+dir_export+'/assets'+fusiontabelement);
+                var content = content+recup_script_origin('./'+dir_export+'/assets'+fusiontabelement+'.'+type);
                 b++;
             }
             //On réecrit le script
