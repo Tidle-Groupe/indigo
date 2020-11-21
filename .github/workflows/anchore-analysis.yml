@@ -5,7 +5,7 @@
 # information on Anchore's container image scanning tool Grype, see
 # https://github.com/anchore/grype
 name: Anchore Container Scan
-on: [workflow_dispatch]
+on:
   schedule:
     - cron: '0 0 */10 * *'
 
