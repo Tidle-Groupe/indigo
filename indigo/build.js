@@ -308,6 +308,7 @@ function build_assets(build, bib_js){
     //On boucle le parse pour chaques routes
     var lengthroutes = build_route.length;
     for(let a = 0; a < lengthroutes;){
+        console.log("Export des js pour la route "+build_route[a]);
         html_parse_js(build_route[a]);
         a++;
     }

@@ -117,8 +117,8 @@ function html_parse_js(routeactive){
 
         a++;
     }
-    console.log(pagemap);
-    console.log(jsutilises);
+    //console.log(pagemap);
+    //console.log(jsutilises);
 
     //Si la page possède des scripts
     if(jsutilises.length !== 0){
@@ -137,9 +137,9 @@ function html_parse_js(routeactive){
             a++;
             incrid++;
         }
-        console.log(idscriptsjs);
+        //console.log(idscriptsjs);
 
-        console.log("===");
+        //console.log("===");
 
         //Tableau de base
         array_page = [];
@@ -182,7 +182,7 @@ function html_parse_js(routeactive){
                             if(scripts_distantelength !== 0){
                                 //Execution de la vérification si la page actuelle contient le script distant
                                 if(scripts_distante.includes(scriptjs)){
-                                    console.log(page+' : '+page_distante+' contient '+scriptjs);
+                                    //console.log(page+' : '+page_distante+' contient '+scriptjs);
                                     //On vérifie si les deux pages on déjà un autre script en commun
                                     if(array_page[page].includes(page_distante)){
                                         //Si l'élément d'avant se suit sur les deux pages
@@ -205,7 +205,7 @@ function html_parse_js(routeactive){
                                                             var indexscriptjs = tab_fusion.indexOf(scriptjs);
                                                             //On vérifie que le script suit l'ancien script dans le tableau
                                                             if(indexscriptjs == Number(indexlastscriptjs+1)){
-                                                                console.log(lastscriptjs+' est déjà dans un tableau suivis par '+scriptjs);
+                                                                //console.log(lastscriptjs+' est déjà dans un tableau suivis par '+scriptjs);
                                                                 var verifbouclefusion = true;
                                                                 //Si on ne trouve pas la page dans la liste des pages associées à la fusion
                                                                 if(!fusionpage[d].includes(page)){
@@ -254,7 +254,7 @@ function html_parse_js(routeactive){
                                                         fusion[incrfusion] = [lastscriptjs, scriptjs];
                                                         fusionpage[incrfusion] = [page_distante, page];
                                                         incrfusion++;
-                                                        console.log(lastscriptjs+' suit '+scriptjs+' dans '+page);
+                                                        //console.log(lastscriptjs+' suit '+scriptjs+' dans '+page);
                                                     }
                                                 }
                                                 //Dans tous les cas on ajoute le script actuel à la var lastscript et on indique que la page à euût une fusion
@@ -371,7 +371,7 @@ function html_parse_js(routeactive){
                     //Récupération de l'id du script
                     var idscript = idscriptsjs[key];
                     exportbalisespages[page].push(idscript);
-                    console.log(key);
+                    //console.log(key);
                 }
             }
             
@@ -456,7 +456,7 @@ function html_parse_js(routeactive){
         var pageutiliseslength = pageutilises.length;
         for(let a = 0; a < pageutiliseslength;){
             var page = pageutilises[a];
-            console.log(page+':');
+            //console.log(page+':');
             var baliseexport = "";
             //On récupère la liste des exports finale de la page
             var exportfinallength = exportfinal[page].length;
@@ -467,7 +467,7 @@ function html_parse_js(routeactive){
             }
             //Réecriture de la balise pour la page
             rewrite_balise_js(baliseexport, './'+dir_export+'/site'+page);
-            console.log(baliseexport);
+            //console.log(baliseexport);
 
             a++;
         }
@@ -506,8 +506,8 @@ function html_parse_js(routeactive){
             a++;
         }
 
-        console.log(scriptreplique);
-        console.log(fusion);
-        console.log(fusionpage);
+        //console.log(scriptreplique);
+        //console.log(fusion);
+        //console.log(fusionpage);
     }
 }
