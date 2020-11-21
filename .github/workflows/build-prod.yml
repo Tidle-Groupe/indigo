@@ -22,7 +22,5 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: ls /indigo
-      working-directory: /home/runner/work/indigo/
     - run: npm ci
-    - run: node indigo/run-prod.js
+    - run: node ./indigo/run-prod.js
