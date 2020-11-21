@@ -25,7 +25,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Use IndigoV1 repository
-    - uses: Tidle-Groupe/indigo@INDIGO-V1
+      uses: Tidle-Groupe/indigo@INDIGO-V1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: git clone 
