@@ -41,7 +41,7 @@ function get_scripts_js(page, pagerepertory){
     return srcjs;
 }
 
-function create_balise(idscript, route){
+function create_balise_js(idscript, route){
     return "<script src=\""+domaine_assets+"/js/"+route+"/"+idscript+".js\"></script>";
 }
 
@@ -63,27 +63,30 @@ function recup_script_origin(path){
     }
 }
 
-function rewrite_script_js(scriptid, content, route){
+function rewrite_script(type, scriptid, content, route){
     //Réecriture du fichier
-    fs.writeFileSync('./'+dir_export+'/assets/js_tmp/'+route+'/'+scriptid+'.js', content, 'utf8');
-    //Minify du js
-    minify({
-        compressor: uglifyES,
-        input: './'+dir_export+'/assets/js_tmp/'+route+'/'+scriptid+'.js',
-        output: './'+dir_export+'/assets/js_tmp/'+route+'/'+scriptid+'.js'
-    });
+    fs.writeFileSync('./'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type, content, 'utf8');
+    //Si c'est un js
+    if(type == "js"){
+        //Minify du js
+        minify({
+            compressor: uglifyES,
+            input: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type,
+            output: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type
+        });
+    }
 }
 
-function html_parse_js(routeactive){
+function scripts_bundler(type, routeactive){
     //Récupération des routes du dossier à partir d'un tableau créer par le build site
     // build_route => donne la liste des routes, build_page[build_route]=> donne la liste des pages pour une route
 
     //Tableau de base
     pagemap = [];
-    jsutilises = [];
+    typeutilises = [];
     pageutilises = [];
 
-    //Vérification des fichiers js utilisés par chaques pages
+    //Vérification des fichiers type utilisés par chaques pages
     //Récupération de la longueur des routes
     //Récupération de la longueur des pages
     var lengthpages = build_page[routeactive].length;
@@ -91,7 +94,10 @@ function html_parse_js(routeactive){
         var page = build_page[routeactive][a];
         //Récupération de la page
         var page_r = fs.readFileSync('./'+dir_export+'/site/'+routeactive+'/'+page, 'utf8');
-        var get_scripts = get_scripts_js(page_r, './'+dir_export+'/site/'+routeactive+'/'+page);
+        //Si c'est un js
+        if(type == "js"){
+            var get_scripts = get_scripts_js(page_r, './'+dir_export+'/site/'+routeactive+'/'+page);
+        }
 
         //Récupération du mappage
         var lengthscript = get_scripts.length;
@@ -99,14 +105,14 @@ function html_parse_js(routeactive){
         //Boucle de récupération des éléments du tableau
         for(let b = 0; b < lengthscript;){
             //Mappage des éléments pages
-            var scriptjs = get_scripts[b];
+            var scripttype = get_scripts[b];
             if(!pagemap[pagenamearay]){
                 pagemap[pagenamearay] = [];
             }
-            pagemap[pagenamearay].push(scriptjs);
-            //Liste des js
-            if(!jsutilises.includes(scriptjs)){
-                jsutilises.push(scriptjs);
+            pagemap[pagenamearay].push(scripttype);
+            //Liste des type
+            if(!typeutilises.includes(scripttype)){
+                typeutilises.push(scripttype);
             }
             //Liste des pages
             if(!pageutilises.includes(pagenamearay)){
@@ -118,26 +124,26 @@ function html_parse_js(routeactive){
         a++;
     }
     //console.log(pagemap);
-    //console.log(jsutilises);
+    //console.log(typeutilises);
 
     //Si la page possède des scripts
-    if(jsutilises.length !== 0){
+    if(typeutilises.length !== 0){
         //Création d'un répertoire pour l'export de la route
-        fs.mkdirsSync('./'+dir_export+'/assets/js_tmp/'+routeactive);
+        fs.mkdirsSync('./'+dir_export+'/assets/'+type+'_tmp/'+routeactive);
 
         //Tableaux des ids pour chaques scripts
-        idscriptsjs = [];
+        idscriptstype = [];
         var incrid = 0;
 
         //Assignation d'un id pour chaques scripts
-        var jsutiliseslength = jsutilises.length;
-        for(let a = 0; a < jsutiliseslength;){
-            var scriptname = jsutilises[a];
-            idscriptsjs[scriptname] = a;
+        var typeutiliseslength = typeutilises.length;
+        for(let a = 0; a < typeutiliseslength;){
+            var scriptname = typeutilises[a];
+            idscriptstype[scriptname] = a;
             a++;
             incrid++;
         }
-        //console.log(idscriptsjs);
+        //console.log(idscriptstype);
 
         //console.log("===");
 
@@ -167,7 +173,7 @@ function html_parse_js(routeactive){
             if(scriptslength !== 0){
                 //On récupère chaques scripts
                 for(let b = 0; b < scriptslength;){
-                    var scriptjs = scripts[b];
+                    var scripttype = scripts[b];
 
                     //On récupère les scripts sur les autres pages
                     for(let c = 0; c < pageutiliseslength;){
@@ -181,15 +187,15 @@ function html_parse_js(routeactive){
                             var scripts_distantelength = scripts_distante.length;
                             if(scripts_distantelength !== 0){
                                 //Execution de la vérification si la page actuelle contient le script distant
-                                if(scripts_distante.includes(scriptjs)){
-                                    //console.log(page+' : '+page_distante+' contient '+scriptjs);
+                                if(scripts_distante.includes(scripttype)){
+                                    //console.log(page+' : '+page_distante+' contient '+scripttype);
                                     //On vérifie si les deux pages on déjà un autre script en commun
                                     if(array_page[page].includes(page_distante)){
                                         //Si l'élément d'avant se suit sur les deux pages
                                         //On regarde si les deux éléments se suivent dans la page actuelle
-                                        if(scripts.indexOf(scriptjs) == Number(scripts.indexOf(lastscriptjs)+1)){
+                                        if(scripts.indexOf(scripttype) == Number(scripts.indexOf(lastscripttype)+1)){
                                             //On regarde si les deux éléments se suivent dans la page distante
-                                            if(scripts_distante.indexOf(scriptjs) == Number(scripts_distante.indexOf(lastscriptjs)+1)){
+                                            if(scripts_distante.indexOf(scripttype) == Number(scripts_distante.indexOf(lastscripttype)+1)){
                                                 //Si les deux éléments se suivent sur les deux pages
                                                 var verifbouclefusion = false;
 
@@ -198,14 +204,14 @@ function html_parse_js(routeactive){
                                                 for(let d = 0; d < fusionlength;){
                                                     var tab_fusion = fusion[d];
                                                     //On vérifie si les deux éléments ne sont pas déjà dans un tableau
-                                                    if(tab_fusion.includes(lastscriptjs)){
-                                                        var indexlastscriptjs = tab_fusion.indexOf(lastscriptjs);
+                                                    if(tab_fusion.includes(lastscripttype)){
+                                                        var indexlastscripttype = tab_fusion.indexOf(lastscripttype);
                                                         //On vérifie que le tableau inclus le script
-                                                        if(tab_fusion.includes(scriptjs)){
-                                                            var indexscriptjs = tab_fusion.indexOf(scriptjs);
+                                                        if(tab_fusion.includes(scripttype)){
+                                                            var indexscripttype = tab_fusion.indexOf(scripttype);
                                                             //On vérifie que le script suit l'ancien script dans le tableau
-                                                            if(indexscriptjs == Number(indexlastscriptjs+1)){
-                                                                //console.log(lastscriptjs+' est déjà dans un tableau suivis par '+scriptjs);
+                                                            if(indexscripttype == Number(indexlastscripttype+1)){
+                                                                //console.log(lastscripttype+' est déjà dans un tableau suivis par '+scripttype);
                                                                 var verifbouclefusion = true;
                                                                 //Si on ne trouve pas la page dans la liste des pages associées à la fusion
                                                                 if(!fusionpage[d].includes(page)){
@@ -222,20 +228,20 @@ function html_parse_js(routeactive){
                                                 //Si la vérification échoue
                                                 if(!verifbouclefusion){
 
-                                                    //On regarde si le lastscriptjs existe en dernière position dans un tableau
+                                                    //On regarde si le lastscripttype existe en dernière position dans un tableau
                                                     //On parcours tous le tableau des fusions
                                                     var fusionlength = fusion.length;
                                                     for(let d = 0; d < fusionlength;){
                                                         var tab_fusion = fusion[d];
                                                         
-                                                        //Récupération du dernier élément du tableau et comparaison avec le lastjsscript
+                                                        //Récupération du dernier élément du tableau et comparaison avec le lasttypescript
                                                         var tabfusionlength = Number(tab_fusion.length-1);
                                                         //Si le dernier élément du tableau est égal au script précédent
-                                                        if(tab_fusion[tabfusionlength] == lastscriptjs){
+                                                        if(tab_fusion[tabfusionlength] == lastscripttype){
                                                             //On ajoute le script à la fusion si il n'est pas déjà dedans
-                                                            if(!tab_fusion.includes(scriptjs)){
+                                                            if(!tab_fusion.includes(scripttype)){
                                                                 //On ajoute la fusion
-                                                                tab_fusion.push(scriptjs);
+                                                                tab_fusion.push(scripttype);
                                                             }
                                                             //On ajoute le script à la fusion page si pas déjà présent
                                                             if(!fusionpage[d].includes(page)){
@@ -251,31 +257,31 @@ function html_parse_js(routeactive){
 
                                                     //Si la vérification échoue
                                                     if(!verifbouclefusion){
-                                                        fusion[incrfusion] = [lastscriptjs, scriptjs];
+                                                        fusion[incrfusion] = [lastscripttype, scripttype];
                                                         fusionpage[incrfusion] = [page_distante, page];
                                                         incrfusion++;
-                                                        //console.log(lastscriptjs+' suit '+scriptjs+' dans '+page);
+                                                        //console.log(lastscripttype+' suit '+scripttype+' dans '+page);
                                                     }
                                                 }
                                                 //Dans tous les cas on ajoute le script actuel à la var lastscript et on indique que la page à euût une fusion
-                                                var lastscriptjs = scriptjs;
+                                                var lastscripttype = scripttype;
                                                 var pagefusion = true;
                                             }else{
-                                                scriptreplique[page][scriptjs] = page_distante;
-                                                var lastscriptjs = scriptjs;
+                                                scriptreplique[page][scripttype] = page_distante;
+                                                var lastscripttype = scripttype;
                                             }
                                         }else{
-                                            scriptreplique[page][scriptjs] = page_distante;
-                                            var lastscriptjs = scriptjs;
+                                            scriptreplique[page][scripttype] = page_distante;
+                                            var lastscripttype = scripttype;
                                         }
                                     }else{
                                         array_page[page].push(page_distante);
-                                        scriptreplique[page][scriptjs] = page_distante;
-                                        var lastscriptjs = scriptjs;
+                                        scriptreplique[page][scripttype] = page_distante;
+                                        var lastscripttype = scripttype;
                                     }
                                 }else{
-                                    scriptreplique[page][scriptjs] = "";
-                                    var lastscriptjs = scriptjs;
+                                    scriptreplique[page][scripttype] = "";
+                                    var lastscripttype = scripttype;
                                 }
                             }
                         }
@@ -306,12 +312,12 @@ function html_parse_js(routeactive){
         }
 
         //Tableaux des ids pour chaques fusions
-        idscriptsjsfusion = [];
+        idscriptstypefusion = [];
 
         //Assignation d'un id pour chaques fusions
         var fusionpagelength = fusion.length;
         for(let a = 0; a < fusionpagelength;){
-            idscriptsjsfusion.push(incrid);
+            idscriptstypefusion.push(incrid);
             a++;
             incrid++;
         }
@@ -358,7 +364,7 @@ function html_parse_js(routeactive){
                 //On parcourt le tableau de la page
                 for(let b = 0; b < fusionnumberlength;){
                     var fusiontabid = fusionnumber[page][b];
-                    var idscriptfusion = idscriptsjsfusion[fusiontabid];
+                    var idscriptfusion = idscriptstypefusion[fusiontabid];
                     exportbalisespages[page].push(idscriptfusion);
 
                     b++;
@@ -369,7 +375,7 @@ function html_parse_js(routeactive){
             if(scriptreplique[page]){
                 for(var key in scriptreplique[page]){
                     //Récupération de l'id du script
-                    var idscript = idscriptsjs[key];
+                    var idscript = idscriptstype[key];
                     exportbalisespages[page].push(idscript);
                     //console.log(key);
                 }
@@ -424,7 +430,7 @@ function html_parse_js(routeactive){
                                 //On récupère l'ordre du script sur la page d'origine
                                 var ordrepageorigine = pagemap[page].indexOf(script);
                                 //On récupère l'id du script de fusion
-                                var idscriptfusion = idscriptsjsfusion[idfusionpage];
+                                var idscriptfusion = idscriptstypefusion[idfusionpage];
                                 //On envois le script dans le tableau d'export à la même place que dans le script d'origine
                                 exportfinal[page].splice(ordrepageorigine, 0, idscriptfusion);
                             }
@@ -440,7 +446,7 @@ function html_parse_js(routeactive){
                         //On récupère l'ordre du script dans la page d'origine
                         var ordrepageorigine = pagemap[page].indexOf(script);
                         //On récupère l'id du script
-                        var idscript = idscriptsjs[script];
+                        var idscript = idscriptstype[script];
                         //On envois le script dans le tableau d'export à la même place que dans le script d'origine
                         exportfinal[page].splice(ordrepageorigine, 0, idscript);
                     }
@@ -462,37 +468,43 @@ function html_parse_js(routeactive){
             var exportfinallength = exportfinal[page].length;
             for(let b = 0; b < exportfinallength;){
                 var scriptidpage = exportfinal[page][b];
-                var baliseexport = baliseexport+create_balise(scriptidpage, routeactive);
+                //Si c'est un js
+                if(type == "js"){
+                    var baliseexport = baliseexport+create_balise_js(scriptidpage, routeactive);
+                }
                 b++;
             }
             //Réecriture de la balise pour la page
-            rewrite_balise_js(baliseexport, './'+dir_export+'/site'+page);
+            //Si c'est un js
+            if(type == "js"){
+                rewrite_balise_js(baliseexport, './'+dir_export+'/site'+page);
+            }
             //console.log(baliseexport);
 
             a++;
         }
 
-        //Réecriture des scripts js non fusionnés
-        //On récupère la liste des scripts js utilisés seuls
+        //Réecriture des scripts type non fusionnés
+        //On récupère la liste des scripts type utilisés seuls
         var scriptssolouselength = scriptssolouse.length;
         for(let a = 0; a < scriptssolouselength;){
             var scriptname = scriptssolouse[a];
-            var idscript = idscriptsjs[scriptname];
+            var idscript = idscriptstype[scriptname];
             //On récupère le script d'origine
             var content = recup_script_origin('./'+dir_export+'/assets'+scriptname);
             //On réecrit le script
-            rewrite_script_js(idscript, content, routeactive);
+            rewrite_script(type, idscript, content, routeactive);
 
             a++;
         }
 
-        //Réecriture des scripts js fusionnés
+        //Réecriture des scripts type fusionnés
         var fusionlength = fusion.length;
         for(let a = 0; a < fusionlength;){
             var fusiontab = fusion[a];
             var content = "";
             //On récupère l'id de cette fusion
-            var idscriptfusion = idscriptsjsfusion[a];
+            var idscriptfusion = idscriptstypefusion[a];
             //On récupère le contenu de chaques scripts
             var fusiontablength = fusiontab.length;
             for(let b = 0; b < fusiontablength;){
@@ -501,7 +513,7 @@ function html_parse_js(routeactive){
                 b++;
             }
             //On réecrit le script
-            rewrite_script_js(idscriptfusion, content, routeactive);
+            rewrite_script(type, idscriptfusion, content, routeactive);
             
             a++;
         }
