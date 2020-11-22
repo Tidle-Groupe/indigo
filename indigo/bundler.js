@@ -1,10 +1,15 @@
 //Parsage du html pour récupérer les scripts js et css utilisés 
 //Script qui s'effectue une fois la compilation terminée, dans la partie des assets
-function get_scripts_js(page, pagerepertory){
+function get_script(type, page, pagerepertory){
     //Variables de bases
-    var regex = /<script.*?src="(.*?).js"><\/script>/gmi;
-    var balisejs = [];
-    var srcjs = [];
+    if(type == "js"){
+        var regex = /<script.*?src="(.*?).js"><\/script>/gmi;
+    }
+    if(type == "css"){
+        var regex = /<link.*?href="(.*?).css">/gmi;
+    }
+    var balise = [];
+    var src = [];
 
     //Récupération du nombre de balises scripts
     var splitscriptend = page.split(regex);
@@ -12,97 +17,58 @@ function get_scripts_js(page, pagerepertory){
     //Boucle de récupération pour chaques balises script
     for(let a = 0; a < scriptlength;){
         //Vérification qu'il s'agit d'une balise script src
-        var src = regex.exec(page);
-        if(src){
+        var srcr = regex.exec(page);
+        if(srcr){
             //Vérification qu'il s'agisse d'une balise src sur le domaine des assets
-            var verif = src[0].indexOf(domaine_assets+"/");
+            var verif = srcr[0].indexOf(domaine_assets+"/");
             if(verif > -1){
                 //Ajout de la balise dans un tableau
-                balisejs.push(src[0]);
+                balise.push(srcr[0]);
                 //Ajout de la source dans un tableau
-                srcjs.push(src[1].replace(domaine_assets, ''));
+                src.push(srcr[1].replace(domaine_assets, ''));
             }
         }
         a++;
     }
-    //Boucle de retrait des balsies scripts de la page
-    var srcjslength = srcjs.length;
-    for(let a = 0; a < srcjslength;){
+    //Boucle de retrait des balises scripts de la page
+    var srclength = src.length;
+    for(let a = 0; a < srclength;){
         //Retrait de la balise script de la page
-        var page = page.replace(balisejs[a], '');
+        var page = page.replace(balise[a], '');
         a++;
     }
     //Réecriture de la page sans les balises
     fs.writeFileSync(pagerepertory, page, 'utf8');
     //Mise à zéro du tableau des balises script
-    var balisejs = [];
+    var balise = [];
 
     //Gestion du retour
-    return srcjs;
+    return src;
 }
 
-function get_scripts_css(page, pagerepertory){
-    //Variables de bases
-    var regex = /<link.*?href="(.*?).css">/gmi;
-    var balisecss = [];
-    var srccss = [];
-
-    //Récupération du nombre de balises scripts
-    var splitscriptend = page.split(regex);
-    var scriptlength = Number(splitscriptend.length-1);
-    //Boucle de récupération pour chaques balises script
-    for(let a = 0; a < scriptlength;){
-        //Vérification qu'il s'agit d'une balise script src
-        var src = regex.exec(page);
-        if(src){
-            //Vérification qu'il s'agisse d'une balise src sur le domaine des assets
-            var verif = src[0].indexOf(domaine_assets+"/");
-            if(verif > -1){
-                //Ajout de la balise dans un tableau
-                balisecss.push(src[0]);
-                //Ajout de la source dans un tableau
-                srccss.push(src[1].replace(domaine_assets, ''));
-            }
-        }
-        a++;
+function create_balise(type, idscript, route){
+    //Si c'est un js
+    if(type == "js"){
+        return "<script src=\""+domaine_assets+"/js/"+route+"/"+idscript+".js\"></script>";
     }
-    //Boucle de retrait des balsies scripts de la page
-    var srccsslength = srccss.length;
-    for(let a = 0; a < srccsslength;){
-        //Retrait de la balise script de la page
-        var page = page.replace(balisecss[a], '');
-        a++;
+    //Si c'est un css
+    if(type == "css"){
+        return "<link rel=\"stylesheet\" href=\""+domaine_assets+"/js/"+route+"/"+idscript+".css\">";
     }
-    //Réecriture de la page sans les balises
-    fs.writeFileSync(pagerepertory, page, 'utf8');
-    //Mise à zéro du tableau des balises script
-    var balisecss = [];
-
-    //Gestion du retour
-    return srccss;
 }
 
-function create_balise_js(idscript, route){
-    return "<script src=\""+domaine_assets+"/js/"+route+"/"+idscript+".js\"></script>";
-}
-function create_balise_css(idscript, route){
-    return "<link rel=\"stylesheet\" href=\""+domaine_assets+"/js/"+route+"/"+idscript+".css\">";
-}
-
-function rewrite_balise_js(scripts, pagerepertory){
+function rewrite_balise(type, scripts, pagerepertory){
     //Récupération de la page
     var page = fs.readFileSync(pagerepertory, 'utf8');
     //Ajout des balises à la fin du document
-    var page = page.replace('</body>', scripts+'</body>');
-    //Réecriture du fichier
-    fs.writeFileSync(pagerepertory, page, 'utf8');
-}
-
-function rewrite_balise_css(scripts, pagerepertory){
-    //Récupération de la page
-    var page = fs.readFileSync(pagerepertory, 'utf8');
-    //Ajout des balises à la fin du document
-    var page = page.replace('</head>', scripts+'</head>');
+    //Si c'est un js
+    if(type == "js"){
+        var page = page.replace('</body>', scripts+'</body>');
+    }
+    //Si c'est un css
+    if(type == "css"){
+        var page = page.replace('</head>', scripts+'</head>');
+    }
     //Réecriture du fichier
     fs.writeFileSync(pagerepertory, page, 'utf8');
 }
@@ -116,35 +82,29 @@ function recup_script_origin(path){
     }
 }
 
-function minify_content(type, content){
-    //On écrit un fichier temporaire
-    fs.writeFileSync('./'+dir_export+'/assets/'+type+'_tmp/tmp.'+type, content, 'utf8');
-    //Si c'est un js
-    if(type == "js"){
-        //Minify du js
-        minify({
-            compressor: uglifyES,
-            input: './'+dir_export+'/assets/'+type+'_tmp/tmp.'+type,
-            output: './'+dir_export+'/assets/'+type+'_tmp/tmp.'+type
-        });
-    }
-    if(type == "css"){
-        //Minify du js
-        minify({
-            compressor: csso,
-            input: './'+dir_export+'/assets/'+type+'_tmp/tmp.'+type,
-            output: './'+dir_export+'/assets/'+type+'_tmp/tmp.'+type
-        });
-    }
-    //On récupère le contenu du fichier minifier
-    var retour = recup_script_origin('./'+dir_export+'/assets/'+type+'_tmp/tmp.'+type);
-    //Retour du contenu minifier
-    return retour;
-}
-
 function rewrite_script(type, scriptid, content, route){
     //Réecriture du fichier
     fs.writeFileSync('./'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type, content, 'utf8');
+    //On minify si on est en build_prod
+    if(dir_export == "build_prod"){
+        //Si c'est un js
+        if(type == "js"){
+            //Minify du js
+            minify({
+                compressor: uglifyES,
+                input: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type,
+                output: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type
+            });
+        }
+        if(type == "css"){
+            //Minify du js
+            minify({
+                compressor: csso,
+                input: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type,
+                output: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type
+            });
+        }
+    }
 }
 
 function scripts_bundler(type, routeactive){
@@ -164,14 +124,8 @@ function scripts_bundler(type, routeactive){
         var page = build_page[routeactive][a];
         //Récupération de la page
         var page_r = fs.readFileSync('./'+dir_export+'/site/'+routeactive+'/'+page, 'utf8');
-        //Si c'est un js
-        if(type == "js"){
-            var get_scripts = get_scripts_js(page_r, './'+dir_export+'/site/'+routeactive+'/'+page);
-        }
-        //Si c'est un css
-        if(type == "css"){
-            var get_scripts = get_scripts_css(page_r, './'+dir_export+'/site/'+routeactive+'/'+page);
-        }
+        //Récupération des scripts
+        var get_scripts = get_script(type, page_r, './'+dir_export+'/site/'+routeactive+'/'+page);
 
         //Récupération du mappage
         var lengthscript = get_scripts.length;
@@ -542,25 +496,12 @@ function scripts_bundler(type, routeactive){
             var exportfinallength = exportfinal[page].length;
             for(let b = 0; b < exportfinallength;){
                 var scriptidpage = exportfinal[page][b];
-                //Si c'est un js
-                if(type == "js"){
-                    var baliseexport = baliseexport+create_balise_js(scriptidpage, routeactive);
-                }
-                //Si c'est un css
-                if(type == "css"){
-                    var baliseexport = baliseexport+create_balise_css(scriptidpage, routeactive);
-                }
+                //Génération de la balise
+                var baliseexport = baliseexport+create_balise(type, scriptidpage, routeactive);
                 b++;
             }
             //Réecriture de la balise pour la page
-            //Si c'est un js
-            if(type == "js"){
-                rewrite_balise_js(baliseexport, './'+dir_export+'/site'+page);
-            }
-            //Si c'est un css
-            if(type == "css"){
-                rewrite_balise_css(baliseexport, './'+dir_export+'/site'+page);
-            }
+            rewrite_balise(type, baliseexport, './'+dir_export+'/site'+page);
             //console.log(baliseexport);
 
             a++;
@@ -574,11 +515,6 @@ function scripts_bundler(type, routeactive){
             var idscript = idscriptstype[scriptname];
             //On récupère le script d'origine
             var content = recup_script_origin('./'+dir_export+'/assets'+scriptname+'.'+type);
-            //On minify si on est en build_prod
-            if(dir_export == "build_prod"){
-                //Sinon on minify le contenu
-                var content = minify_content(type, content);
-            }
             //On réecrit le script
             rewrite_script(type, idscript, content, routeactive);
 
@@ -598,11 +534,6 @@ function scripts_bundler(type, routeactive){
                 var fusiontabelement = fusiontab[b];
                 var content = content+recup_script_origin('./'+dir_export+'/assets'+fusiontabelement+'.'+type);
                 b++;
-            }
-            //On minify si on est en build_prod
-            if(dir_export == "build_prod"){
-                //Sinon on minify le contenu
-                var content = minify_content(type, content);
             }
             //On réecrit le script
             rewrite_script(type, idscriptfusion, content, routeactive);
