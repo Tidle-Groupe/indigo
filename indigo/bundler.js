@@ -13,7 +13,6 @@ function get_scripts_js(page, pagerepertory){
     for(let a = 0; a < scriptlength;){
         //Vérification qu'il s'agit d'une balise script src
         var src = regex.exec(page);
-        console.log(src.length);
         if(src){
             //Vérification qu'il s'agisse d'une balise src sur le domaine des assets
             var verif = src[0].indexOf(domaine_assets+"/");
@@ -117,26 +116,35 @@ function recup_script_origin(path){
     }
 }
 
-function rewrite_script(type, scriptid, content, route){
-    //Réecriture du fichier
-    fs.writeFileSync('./'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type, content, 'utf8');
+function minify_content(type, content){
+    //On écrit un fichier temporaire
+    fs.writeFileSync('./'+dir_export+'/assets/'+type+'_tmp/tmp.'+type, content, 'utf8');
     //Si c'est un js
     if(type == "js"){
         //Minify du js
         minify({
             compressor: uglifyES,
-            input: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type,
-            output: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type
+            input: './'+dir_export+'/assets/'+type+'_tmp/tmp.'+type,
+            output: './'+dir_export+'/assets/'+type+'_tmp/tmp.'+type
         });
     }
     if(type == "css"){
         //Minify du js
         minify({
             compressor: csso,
-            input: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type,
-            output: './'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type
+            input: './'+dir_export+'/assets/'+type+'_tmp/tmp.'+type,
+            output: './'+dir_export+'/assets/'+type+'_tmp/tmp.'+type
         });
     }
+    //On récupère le contenu du fichier minifier
+    var retour = recup_script_origin('./'+dir_export+'/assets/'+type+'_tmp/tmp.'+type);
+    //Retour du contenu minifier
+    return retour;
+}
+
+function rewrite_script(type, scriptid, content, route){
+    //Réecriture du fichier
+    fs.writeFileSync('./'+dir_export+'/assets/'+type+'_tmp/'+route+'/'+scriptid+'.'+type, content, 'utf8');
 }
 
 function scripts_bundler(type, routeactive){
@@ -566,6 +574,11 @@ function scripts_bundler(type, routeactive){
             var idscript = idscriptstype[scriptname];
             //On récupère le script d'origine
             var content = recup_script_origin('./'+dir_export+'/assets'+scriptname+'.'+type);
+            //On minify si on est en build_prod
+            if(dir_export == "build_prod"){
+                //Sinon on minify le contenu
+                var content = minify_content(type, content);
+            }
             //On réecrit le script
             rewrite_script(type, idscript, content, routeactive);
 
@@ -585,6 +598,11 @@ function scripts_bundler(type, routeactive){
                 var fusiontabelement = fusiontab[b];
                 var content = content+recup_script_origin('./'+dir_export+'/assets'+fusiontabelement+'.'+type);
                 b++;
+            }
+            //On minify si on est en build_prod
+            if(dir_export == "build_prod"){
+                //Sinon on minify le contenu
+                var content = minify_content(type, content);
             }
             //On réecrit le script
             rewrite_script(type, idscriptfusion, content, routeactive);
