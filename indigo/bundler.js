@@ -7,12 +7,13 @@ function get_scripts_js(page, pagerepertory){
     var srcjs = [];
 
     //Récupération du nombre de balises scripts
-    var splitscriptend = page.split('</script>');
+    var splitscriptend = page.split(regex);
     var scriptlength = Number(splitscriptend.length-1);
     //Boucle de récupération pour chaques balises script
     for(let a = 0; a < scriptlength;){
         //Vérification qu'il s'agit d'une balise script src
         var src = regex.exec(page);
+        console.log(src.length);
         if(src){
             //Vérification qu'il s'agisse d'une balise src sur le domaine des assets
             var verif = src[0].indexOf(domaine_assets+"/");
@@ -48,7 +49,7 @@ function get_scripts_css(page, pagerepertory){
     var srccss = [];
 
     //Récupération du nombre de balises scripts
-    var splitscriptend = page.split('<link');
+    var splitscriptend = page.split(regex);
     var scriptlength = Number(splitscriptend.length-1);
     //Boucle de récupération pour chaques balises script
     for(let a = 0; a < scriptlength;){

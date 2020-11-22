@@ -265,7 +265,7 @@ function build_assets(build, bib_js){
     if(fs.pathExistsSync('./sources/assets/css/')){
         css_replace('');
         //Parsage du html pour récupérer les éléments css utilisés
-        eval(fs.readFileSync(__dirname + "/parse-html.js")+'');
+        eval(fs.readFileSync(__dirname + "/bundler.js")+'');
         //On supprime l'ancien répertoire css_tmp si existe
         if(fs.pathExistsSync('./'+dir_export+'/assets/css_tmp/')){
             fs.removeSync('./'+dir_export+'/assets/css_tmp/');
@@ -326,7 +326,7 @@ function build_assets(build, bib_js){
     if(fs.pathExistsSync('./sources/assets/js/')){
         js_replace('');
         //Parsage du html pour récupérer les éléments js utilisés
-        eval(fs.readFileSync(__dirname + "/parse-html.js")+'');
+        eval(fs.readFileSync(__dirname + "/bundler.js")+'');
         //On supprime l'ancien répertoire js_tmp si existe
         if(fs.pathExistsSync('./'+dir_export+'/assets/js_tmp/')){
             fs.removeSync('./'+dir_export+'/assets/js_tmp/');
