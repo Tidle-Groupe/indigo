@@ -1,10 +1,22 @@
 const fs = require('fs-extra');
+const exec = require('child_process').execSync;
 const chokidar = require('chokidar');
 
 var build = "dev";
 
 //Message de début de construction
 console.log("Début du build !");
+
+//Vérification que les conteneurs tournent
+//Récupération de la config
+var content = JSON.parse(fs.readFileSync('indigo.json', 'utf8'));
+//Execution de la commande docker ps
+var list_start = exec('docker ps').toString();
+//Si aucuns conteneurs allumés ne correspondent au nom des conteneurs du projet courant
+if(!list_start.includes(" "+content.docker_name+"_")){
+  //On start manuellement le docker compose
+  exec('docker-compose -f docker.yml start');
+}
 
 //Execution du build de départ
 eval(fs.readFileSync(__dirname + "/build.js")+'');
