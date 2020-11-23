@@ -52,6 +52,10 @@ if(verif_indigo()){
             break;
         //Affichage d'une erreur espace de travail indigo non reconnus
         default:
-            console.log("Le répertoire courant n'est pas un espace de travail indigo, la commande \"indigo "+Args[0]+"\" ne peut pas être utilisée ici");
+            var arg_help = "";
+            if(Args[0]){
+                var arg_help = " "+Args[0];
+            }
+            console.log("Le répertoire courant n'est pas un espace de travail indigo, la commande \"indigo"+arg_help+"\" ne peut pas être utilisée ici");
     }
 }
