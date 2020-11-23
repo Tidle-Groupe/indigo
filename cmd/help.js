@@ -5,7 +5,7 @@ var help = `
       new ................ créer un nouveau projet indigo
       build .............. créer un build à partir des fichiers de l'espace de travail indigo courant
       run ................ lance un serveur local à partir de votre espace de travail indigo courant
-      docker ............. permet de gérer les conteneurs docker qui lancent le serveur local
+      docker ............. permet de gérer les conteneurs docker pour chaques projets
       help ............... permet d'afficher ce texte
       
       Pour plus d'informations, reportez-vous à la documentation:

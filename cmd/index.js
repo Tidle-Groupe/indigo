@@ -26,7 +26,7 @@ if(verif_indigo()){
         case 'build':
             require('../cmd/build.js');
             break;
-        //Installation de docker pour indigo (installation commune pour tous les espaces de travail)
+        //Gestion de docker pour les projets indigo
         case 'docker':
             require('../cmd/docker.js');
             break;
@@ -41,10 +41,6 @@ if(verif_indigo()){
         //Création d'un nouvelle espace de travail indigo
         case 'new':
             require('../cmd/new.js');
-            break;
-        //Installation de docker pour indigo (installation commune pour tous les espaces de travail)
-        case 'docker':
-            require('../cmd/docker.js');
             break;
         //Affichage des commandes disponibles
         case 'help':

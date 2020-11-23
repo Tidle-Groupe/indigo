@@ -34,8 +34,8 @@ function docker_mongodb_add(d){
 function docker_memcached_add(d){
     return d+"\r\n\r\n  memcached:\r\n    image: memcached\r\n    ports:\r\n      - 11211:11211";
 }
-function bdd_choix(bdd, cache){
-    console.log("Installation en cours...");
+function bdd_choix(bdd, cache, name){
+    console.log("Configuration en cours de docker...");
     //Passage en minuscule de l'entrée
     var bdd = bdd.toLowerCase();
     var cache = cache.toLowerCase();
@@ -110,20 +110,41 @@ function bdd_choix(bdd, cache){
     var docker_compose = replaceAll("{links_list}", links_replace, docker_compose);
 
     //Ecriture du fichier docker
-    fs.writeFileSync('./indigo.yml', docker_compose, 'utf8');
-    console.log("Installation terminée !");
+    fs.writeFileSync(repertoire+'/docker.yml', docker_compose, 'utf8');
+
+    //Ecriture du fichier .env pour le nom des conteneurs
+    if(!name){
+        var name = repertoire;
+    }
+    var name = name.split(/\W/g).join('');
+    fs.writeFileSync(repertoire+'/.env', "COMPOSE_PROJECT_NAME="+name, 'utf8');
+
+    console.log("Configuration de docker terminée !");
+
+    //Appel du script d'installation
+    install_docker();
+}
+function install_docker(){
+    //Installation de docker
+    console.log("Installation des conteneurs docker...");
+    require('child_process').execSync('docker-compose -f '+repertoire+'/docker.yml up -d').toString();
+    console.log("Installation des conteneurs docker terminée !");
 }
 
-//Initialisation de la première route
+console.log("Configuration de docker...");
 
 //Construction du fichier docker à partir des éléments rentrés
 console.log("Quelles bases de données voulez vous utiliser ?");
 console.log("saisissez les noms séparés de - ");
 console.log("Redis-MongoDB-MariaDB-Postgres");
-rl.question('', (choix_bdd) => {
-    console.log("Installer Memcached ? O-N");
-    rl.question('', (choixmemcached) => {
-        bdd_choix(choix_bdd, choixmemcached);
-        rl.close();
+rl.question('BDD: ', (choix_bdd) => {
+    console.log("Installer Memcached ?");
+    rl.question('O-N: ', (choixmemcached) => {
+        var namer = repertoire.split(/\W/g).join('');
+        console.log("Choisissez un nom pour les conteneurs docker du projet (par défaut \""+namer+"\")");
+        rl.question('nom: ', (choixname) => {
+            bdd_choix(choix_bdd, choixmemcached, choixname);
+            rl.close();
+        });
     });
 });
