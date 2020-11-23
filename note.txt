@@ -1,5 +1,1 @@
 Il n'est pas recommander d'utiliser une balise script pour directement y écrire du js, les balises js étants réecrites en dernière, le script js dans les balises scripts sera executer en premier
-
-Vérifier que le même script n'apparaisse pas deux fois sur la même page en cas de fusion
-Fixer le beug bibliothèque indigo qui s'importe quand même même si pas demandée (et en même temps passer la bibliothèque dans le parse-html)
-Faire le parse-html par routes et non tous d'un coup

@@ -1,11 +1,14 @@
 {
-  "name": "indigo",
-  "version": "1.0.0",
+  "name": "@tidle-groupe/indigo",
+  "version": "0.1.0",
   "description": "Un environnement de programmation léger avec rendu local et construction des fichiers pour la production",
-  "main": "indigo/main.js",
+  "main": "cmd/index.js",
+  "bin": {
+    "indigo": "bin/indigo"
+  },
   "scripts": {
-    "build-prod": "node indigo/run-prod.js",
-    "run-dev": "node indigo/run-dev.js",
+    "Build": "indigo build",
+    "Run": "indigo run",
     "docker-start": "docker-compose -f indigo.yml start",
     "docker-stop": "docker-compose -f indigo.yml stop",
     "docker-install": "docker-compose -f indigo.yml up -d",
@@ -14,10 +17,8 @@
   "author": "Théo Laubezout",
   "license": "GPL-3.0",
   "repository": {
-    "type": "git",
-    "url": "https://github.com/Tidle-Groupe/indigo.git"
+    "url": "git+https://github.com/Tidle-Groupe/indigo.git"
   },
-  "readmeFilename": "README.md",
   "dependencies": {
     "@node-minify/core": "^6.1.0",
     "@node-minify/csso": "^6.1.0",
@@ -27,5 +28,10 @@
     "fs": "0.0.1-security",
     "fs-extra": "^9.0.1",
     "readline": "^1.3.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/Tidle-Groupe/indigo/issues"
+  },
+  "homepage": "https://github.com/Tidle-Groupe/indigo#readme",
+  "devDependencies": {}
 }
