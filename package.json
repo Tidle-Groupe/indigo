@@ -7,8 +7,8 @@
     "indigo": "bin/indigo"
   },
   "scripts": {
-    "build-prod": "node indigo/run-prod.js",
-    "run-dev": "node indigo/run-dev.js",
+    "Build": "indigo build",
+    "Run": "indigo run",
     "docker-start": "docker-compose -f indigo.yml start",
     "docker-stop": "docker-compose -f indigo.yml stop",
     "docker-install": "docker-compose -f indigo.yml up -d",

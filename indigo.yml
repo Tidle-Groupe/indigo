@@ -4,7 +4,6 @@ services:
 
   php_site_api:
     image: tidleindigo/serverlocal:latest
-    restart: always
     ports:
       - 80:80
     links:
@@ -17,7 +16,6 @@ services:
 
   apache_assets:
     image: httpd
-    restart: always
     ports:
       - 9000:80
     volumes:
@@ -25,7 +23,6 @@ services:
 
   db:
     image: mariadb
-    restart: always
     ports:
       - 3306:3306
     environment:
@@ -34,7 +31,6 @@ services:
 
   phpmyadmin:
     image: phpmyadmin
-    restart: always
     ports:
       - 8080:80
     environment:
@@ -42,12 +38,10 @@ services:
 
   redis:
     image: redis
-    restart: always
     ports:
       - 6379:6379
 
   memcached:
     image: memcached
-    restart: always
     ports:
       - 11211:11211
