@@ -119,6 +119,11 @@ function bdd_choix(bdd, cache, name){
     var name = name.split(/\W/g).join('');
     fs.writeFileSync(repertoire+'/.env', "COMPOSE_PROJECT_NAME="+name, 'utf8');
 
+    //Ecriture du nom des conteneurs docker dans le fichier indigo.json
+    var content = JSON.parse(fs.readFileSync(repertoire+'/indigo.json', 'utf8'));
+    content.docker_name = name;
+    fs.writeJsonSync(repertoire+'/indigo.json', content);
+
     console.log("Configuration de docker terminée !");
 
     //Appel du script d'installation

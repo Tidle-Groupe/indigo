@@ -56,7 +56,7 @@ if(verif_base()){
     //On copie le répertoire source par défaut
     fs.copySync(process.env.dp0+'node_modules\\@tidle-groupe\\indigo\\sources', repertoire+'/sources');
     //Création du fichier indigo
-    fs.writeJsonSync(repertoire+'/indigo.json', {version: '1.0.0'});
+    fs.writeJsonSync(repertoire+'/indigo.json', {"version":"1.0.0"});
     //Création du package
     package_generate(repertoire);
     //On copie le fichier de config initial
