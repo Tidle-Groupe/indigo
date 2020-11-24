@@ -118,6 +118,7 @@ function bdd_choix(bdd, cache, name){
     }
     var name = name.split(/\W/g).join('');
     fs.writeFileSync(repertoire+'/.env', "COMPOSE_PROJECT_NAME="+name, 'utf8');
+    fs.writeFileSync('.env', "COMPOSE_PROJECT_NAME="+name, 'utf8');
 
     //Ecriture du nom des conteneurs docker dans le fichier indigo.json
     var content = JSON.parse(fs.readFileSync(repertoire+'/indigo.json', 'utf8'));
@@ -133,6 +134,8 @@ function install_docker(){
     //Installation de docker
     console.log("Installation des conteneurs docker...");
     require('child_process').execSync('docker-compose -f '+repertoire+'/docker.yml up -d').toString();
+    //Suppression du .env d'installation
+    fs.unlinkSync('.env');
     console.log("Installation des conteneurs docker terminée !");
 }
 

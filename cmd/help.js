@@ -9,6 +9,7 @@ var help = `
       help ............... permet d'afficher cette aide
       
       Pour plus d'informations, reportez-vous à la documentation:
-      https://github.com/Tidle-Groupe/indigo/wiki`;
+      https://github.com/Tidle-Groupe/indigo/wiki
+      `;
       
 console.log(help);

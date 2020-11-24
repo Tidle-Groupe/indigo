@@ -1,4 +1,5 @@
 const fs = require('fs-extra');
+const exec = require('child_process').execSync;
 //Création d'un nouvelle espace de travail indigo
 var Args = process.argv.slice(2);
 repertoire = Args[1];
@@ -8,7 +9,7 @@ function verif_base(){
     //On vérifie la présence d'un nom pour l'environnement
     if(repertoire){
         //On vérifie que le nom respecte le nom d'un dossier valide
-        var regex = RegExp('^([a-zA-Z0-9_]|[à-ú]|[À-Ú])+$');
+        var regex = RegExp('^([a-zA-Z0-9_-]|[à-ú]|[À-Ú])+$');
         if(regex.test(repertoire)){
             //On vérifie que le dossier n'est pas existant
             if(fs.pathExistsSync(repertoire)){
@@ -42,6 +43,11 @@ async function loader(msg){
     }, 250);
 }
 
+//Fonction pour récupérer le répertoire global
+function get_global_directory(){
+    return exec('npm config get prefix').toString();
+}
+
 //Création du package
 function package_generate(name){
     //Passage du nom en caractères alphanumérique
@@ -53,14 +59,17 @@ function package_generate(name){
 //Vérification de base
 if(verif_base()){
     console.log("Installation en cours du projet \""+repertoire+"\"");
+    //On récupère le répertoire global
+    var global_dir = get_global_directory();
+    var global_dir = global_dir.replace(/\n|\r/g,'');
     //On copie le répertoire source par défaut
-    fs.copySync(process.env.dp0+'node_modules\\@tidle-groupe\\indigo\\sources', repertoire+'/sources');
+    fs.copySync(global_dir+'\\node_modules\\@tidle-groupe\\indigo\\sources', repertoire+'/sources');
     //Création du fichier indigo
     fs.writeJsonSync(repertoire+'/indigo.json', {"version":"1.0.0"});
     //Création du package
     package_generate(repertoire);
     //On copie le fichier de config initial
-    fs.copySync(process.env.dp0+'node_modules\\@tidle-groupe\\indigo\\config.json', repertoire+'/config.json');
+    fs.copySync(global_dir+'\\node_modules\\@tidle-groupe\\indigo\\config.json', repertoire+'/config.json');
     console.log("Installation terminée");
 
     //Appel du script de d'installation docker

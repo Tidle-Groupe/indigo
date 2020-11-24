@@ -42,16 +42,19 @@ if(verif_indigo()){
         case 'new':
             require('../cmd/new.js');
             break;
-        //Affichage des commandes disponibles
-        case 'help':
-            require('../cmd/help.js');
-            break;
         //Affichage d'une erreur espace de travail indigo non reconnus
-        default:
+        case 'run':
+        case 'build':
+        case 'docker':
             var arg_help = "";
             if(Args[0]){
                 var arg_help = " "+Args[0];
             }
             console.log("Le répertoire courant n'est pas un espace de travail indigo, la commande \"indigo"+arg_help+"\" ne peut pas être utilisée ici");
+            break;
+        //Affichage des commandes disponibles
+        default:
+            require('../cmd/help.js');
+            break;
     }
 }
