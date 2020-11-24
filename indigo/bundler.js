@@ -1,3 +1,7 @@
+const fs = require('fs-extra');
+const minify = require('@node-minify/core');
+const csso = require('@node-minify/csso');
+const uglifyES = require('@node-minify/uglify-es');
 //Parsage du html pour récupérer les scripts js et css utilisés 
 //Script qui s'effectue une fois la compilation terminée, dans la partie des assets
 function get_script(type, page, pagerepertory){
@@ -107,7 +111,7 @@ function rewrite_script(type, scriptid, content, route){
     }
 }
 
-function scripts_bundler(type, routeactive){
+exports.scripts_bundler = function (type, routeactive){
     //Récupération des routes du dossier à partir d'un tableau créer par le build site
     // build_route => donne la liste des routes, build_page[build_route]=> donne la liste des pages pour une route
 

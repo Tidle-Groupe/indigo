@@ -1,4 +1,10 @@
-function pars_po(page, route){
+const fs = require('fs-extra');
+
+function replaceAll(rec, rem, c){
+    return c.split(rec).join(rem);
+}
+
+exports.parse = function (page, route){
 
     //Recherche du début du script
     var debut = page.indexOf('<?po');

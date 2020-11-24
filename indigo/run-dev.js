@@ -2,8 +2,6 @@ const fs = require('fs-extra');
 const exec = require('child_process').execSync;
 const chokidar = require('chokidar');
 
-var build = "dev";
-
 //Message de début de construction
 console.log("Début du build !");
 
@@ -19,15 +17,16 @@ if(!list_start.includes(" "+content.docker_name+"_")){
 }
 
 //Execution du build de départ
-eval(fs.readFileSync(__dirname + "/build.js")+'');
+var build = require('../indigo/build.js');
+build.init("dev");
 //Comptage du temps du build de départ
 var timebuildsite = Date.now();
-build_bib_js = build_site("dev");
+build_bib_js = build.build_site("dev");
 var timebuildsite = Date.now()-timebuildsite;
 var timebuildassets = Date.now();
-build_assets("dev", build_bib_js);
+build.build_assets("dev", build_bib_js);
 var timebuildassets = Date.now()-timebuildassets;
-build_api("dev");
+build.build_api("dev");
 watchfilebuild(timebuildsite, timebuildassets);
 //Message de fin de construction
 console.log("Build terminée !");
@@ -47,7 +46,7 @@ function watchfilebuild(timebuildinitsite, timebuildinitassets){
       console.log("Début du build !");
       //Comptage du nouveau temps de build
       var clock = Date.now();
-      build_site("dev");
+      build.build_site("dev");
       timebuildsite = Date.now()-clock;
       console.log("Build site fini");
       clocklastsite = Date.now();
@@ -62,7 +61,7 @@ function watchfilebuild(timebuildinitsite, timebuildinitassets){
       console.log("Début du build !");
       //Comptage du nouveau temps de build
       var clock = Date.now();
-      build_assets("dev", build_bib_js);
+      build.build_assets("dev", build_bib_js);
       timebuildassets = Date.now()-clock;
       console.log("Build assets fini");
       clocklastassets = Date.now();

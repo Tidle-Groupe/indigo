@@ -2,8 +2,8 @@
 const fs = require('fs-extra');
 const minify = require('@node-minify/core');
 const htmlMinifier = require('@node-minify/html-minifier');
-const csso = require('@node-minify/csso');
-const uglifyES = require('@node-minify/uglify-es');
+var po = require('../indigo/parse-po.js');
+var bundler = require('../indigo/bundler.js');
 
 //Lecture de la config
 var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
@@ -20,23 +20,25 @@ function get_no_extension(f) {
     return c.replace(/\.([a-z]+)$/, '');
 }
 
-//Définition des variables de base
-if(build == "prod"){
-    //Si l'export est une prod
-    domaine_site = config.domaines.site;
-    domaine_assets = config.domaines.assets;
-    domaine_api_int = config.domaines.site+"/api";
-    domaine_api_ext = config.domaines.api;
+exports.init = function(build){
+    //Définition des variables de base
+    if(build == "prod"){
+        //Si l'export est une prod
+        domaine_site = config.domaines.site;
+        domaine_assets = config.domaines.assets;
+        domaine_api_int = config.domaines.site+"/api";
+        domaine_api_ext = config.domaines.api;
 
-    dir_export = "build_prod";
-}else{
-    //Sinon par défaut on considère l'export comme dev
-    domaine_site = "http://localhost";
-    domaine_assets = "http://localhost:9000";
-    domaine_api_int = "http://localhost/api";
-    domaine_api_ext = "";
+        dir_export = "build_prod";
+    }else{
+        //Sinon par défaut on considère l'export comme dev
+        domaine_site = "http://localhost";
+        domaine_assets = "http://localhost:9000";
+        domaine_api_int = "http://localhost/api";
+        domaine_api_ext = "";
 
-    dir_export = "build_dev";
+        dir_export = "build_dev";
+    }
 }
 
 function replace_domaines(input){
@@ -52,7 +54,7 @@ function replace_domaines(input){
     return page_r;
 }
 
-function build_site(build){
+exports.build_site = function (build){
 
     //Variables de base
     var bib_js_w = false;
@@ -146,8 +148,7 @@ function build_site(build){
                             var page_name = get_no_extension(page[b]);
 
                             //Parsage du po avec renvois sous forme de code html
-                            require('../indigo/parse-po.js');
-                            var page_r = pars_po(page_r, routes[a]);
+                            var page_r = po.parse(page_r, routes[a]);
 
                             //Ajout de la bibliothèque de scripts js
                             if(page_r.includes("<indigo-js></indigo-js>")){
@@ -208,7 +209,7 @@ function build_site(build){
         return false;
     }
 }
-function build_assets(build, bib_js){
+exports.build_assets = function (build, bib_js){
     //Gestion de la partie assets
 
     //Suppression de l'ancien dossier
@@ -265,7 +266,7 @@ function build_assets(build, bib_js){
     if(fs.pathExistsSync('./sources/assets/css/')){
         css_replace('');
         //Parsage du html pour récupérer les éléments css utilisés
-        require('../indigo/run-prod.js');
+        
         //On supprime l'ancien répertoire css_tmp si existe
         if(fs.pathExistsSync('./'+dir_export+'/assets/css_tmp/')){
             fs.removeSync('./'+dir_export+'/assets/css_tmp/');
@@ -274,7 +275,7 @@ function build_assets(build, bib_js){
         var lengthroutes = build_route.length;
         for(let a = 0; a < lengthroutes;){
             console.log("Export des css pour la route "+build_route[a]);
-            scripts_bundler("css", build_route[a]);
+            bundler.scripts_bundler("css", build_route[a]);
             a++;
         }
         //Si le répertoire css_tmp existe
@@ -326,7 +327,6 @@ function build_assets(build, bib_js){
     if(fs.pathExistsSync('./sources/assets/js/')){
         js_replace('');
         //Parsage du html pour récupérer les éléments js utilisés
-        require('../indigo/bundler.js');
         //On supprime l'ancien répertoire js_tmp si existe
         if(fs.pathExistsSync('./'+dir_export+'/assets/js_tmp/')){
             fs.removeSync('./'+dir_export+'/assets/js_tmp/');
@@ -335,7 +335,7 @@ function build_assets(build, bib_js){
         var lengthroutes = build_route.length;
         for(let a = 0; a < lengthroutes;){
             console.log("Export des js pour la route "+build_route[a]);
-            scripts_bundler("js", build_route[a]);
+            bundler.scripts_bundler("js", build_route[a]);
             a++;
         }
         //Si le répertoire js_tmp existe
@@ -351,7 +351,7 @@ function build_assets(build, bib_js){
         }
     }
 }
-function build_api(build){
+exports.build_api = function (build){
     //Gestion de la partie api
 
     //Gestion de la partie api interne
