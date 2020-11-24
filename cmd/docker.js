@@ -60,10 +60,18 @@ function routage_choix(choix){
 
 }
 
-//Demande de l'action à effectuer sur les conteneurs
-console.log("Quelle action effectuer ?");
-console.log("start, stop, install, uninstall, help");
-rl.question('', (choix) => {
-    routage_choix(choix);
+//Si une option est fournis avec la commande
+var Args = process.argv.slice(2);
+if(Args[1]){
+    routage_choix(Args[1]);
     rl.close();
-});
+}else{
+    //Demande de l'action à effectuer sur les conteneurs
+    console.log("Quelle action effectuer ?");
+    console.log("start, stop, install, uninstall, help");
+    rl.question('', (choix) => {
+        routage_choix(choix);
+        rl.close();
+    });
+
+}
