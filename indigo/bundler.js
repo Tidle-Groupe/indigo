@@ -57,7 +57,7 @@ function create_balise(type, idscript, route){
     }
     //Si c'est un css
     if(type == "css"){
-        return "<link rel=\"stylesheet\" href=\""+domaine_assets+"/js/"+route+"/"+idscript+".css\">";
+        return "<link rel=\"stylesheet\" href=\""+domaine_assets+"/css/"+route+"/"+idscript+".css\">";
     }
 }
 
