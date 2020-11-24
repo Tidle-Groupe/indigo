@@ -52,7 +52,7 @@ function get_global_directory(){
 function package_generate(name){
     //Passage du nom en caractères alphanumérique
     var namer = name.split(/\W/g).join('');
-    var json = '{\r\n  "name": "'+namer+'",\r\n  "version": "0.0.0",\r\n  "scripts": {\r\n    "Build": "indigo build",\r\n    "Run": "indigo run",\r\n    "Docker": "indigo docker"\r\n  },\r\n  "private": true\r\n}';
+    var json = '{\r\n  "name": "'+namer+'",\r\n  "version": "0.0.0",\r\n  "scripts": {\r\n    "Build": "indigo build",\r\n    "Run": "indigo run",\r\n    "Docker": "indigo docker"\r\n  },\r\n  "private": true,\r\n  "devDependencies": {\r\n    "@tidle-groupe/indigo": "1.0.0"\r\n  }\r\n}';
     fs.writeFileSync(name+'/package.json', json, 'utf8');
 }
 
