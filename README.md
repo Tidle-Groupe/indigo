@@ -68,7 +68,7 @@ indigo docker <start|stop|install|uninstall>
 
 ## 🤝 Contribuer
 
-Les contributions, issues et demandes de fonctionnalités sont les bienvenus ! <br /> N'hésitez pas à consulter la page des [issues](https://github.com/Tidle-Groupe/indigo/issues). Vous pouvez également consulter le [guide de contribution](https://github.com/Tidle-Groupe/indigo/blob/master/CONTRIBUTING.md).
+Les contributions, issues et demandes de fonctionnalités sont les bienvenus ! <br /> N'hésitez pas à consulter la page des [issues](https://github.com/Tidle-Groupe/indigo/issues). Vous pouvez également consulter le [guide de contribution](https://github.com/Tidle-Groupe/indigo/blob/master/CONTRIBUTING.md). <br /> Si vous souhaitez suivre l'avancement du projet, une roadmap est disponible [ici](https://trello.com/b/imtsTQsB).
 
 ## Montrez votre soutien
 
