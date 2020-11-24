@@ -1,18 +1,10 @@
 {
   "name": "@tidle-groupe/indigo",
-  "version": "0.1.0",
-  "description": "Un environnement de programmation léger avec rendu local et construction des fichiers pour la production",
+  "version": "1.0.0",
+  "description": "Un framework de programmation léger avec rendu local du site, assets, api, bases de données et construction des fichiers pour la production.",
   "main": "cmd/index.js",
   "bin": {
     "indigo": "bin/indigo"
-  },
-  "scripts": {
-    "Build": "indigo build",
-    "Run": "indigo run",
-    "docker-start": "docker-compose -f indigo.yml start",
-    "docker-stop": "docker-compose -f indigo.yml stop",
-    "docker-install": "docker-compose -f indigo.yml up -d",
-    "docker-uninstall": "docker-compose -f indigo.yml down"
   },
   "author": "Théo Laubezout",
   "license": "GPL-3.0",
@@ -33,5 +25,8 @@
     "url": "https://github.com/Tidle-Groupe/indigo/issues"
   },
   "homepage": "https://github.com/Tidle-Groupe/indigo#readme",
-  "devDependencies": {}
+  "engines": {
+    "npm": ">=6.5.0",
+    "node": ">=10.0.0"
+  }
 }
