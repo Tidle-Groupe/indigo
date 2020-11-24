@@ -146,7 +146,7 @@ function build_site(build){
                             var page_name = get_no_extension(page[b]);
 
                             //Parsage du po avec renvois sous forme de code html
-                            eval(fs.readFileSync(__dirname + "/parse-po.js")+'');
+                            require('../indigo/parse-po.js');
                             var page_r = pars_po(page_r, routes[a]);
 
                             //Ajout de la bibliothèque de scripts js
@@ -265,7 +265,7 @@ function build_assets(build, bib_js){
     if(fs.pathExistsSync('./sources/assets/css/')){
         css_replace('');
         //Parsage du html pour récupérer les éléments css utilisés
-        eval(fs.readFileSync(__dirname + "/bundler.js")+'');
+        require('../indigo/run-prod.js');
         //On supprime l'ancien répertoire css_tmp si existe
         if(fs.pathExistsSync('./'+dir_export+'/assets/css_tmp/')){
             fs.removeSync('./'+dir_export+'/assets/css_tmp/');
@@ -326,7 +326,7 @@ function build_assets(build, bib_js){
     if(fs.pathExistsSync('./sources/assets/js/')){
         js_replace('');
         //Parsage du html pour récupérer les éléments js utilisés
-        eval(fs.readFileSync(__dirname + "/bundler.js")+'');
+        require('../indigo/bundler.js');
         //On supprime l'ancien répertoire js_tmp si existe
         if(fs.pathExistsSync('./'+dir_export+'/assets/js_tmp/')){
             fs.removeSync('./'+dir_export+'/assets/js_tmp/');
