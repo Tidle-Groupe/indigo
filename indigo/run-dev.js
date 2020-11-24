@@ -5,6 +5,17 @@ const chokidar = require('chokidar');
 //Message de début de construction
 console.log("Début du build !");
 
+//Evenements à la fermeture
+[`exit`, `SIGINT`, `SIGUSR1`, `SIGUSR2`, `uncaughtException`, `SIGTERM`].forEach((eventType) => {
+  process.on(eventType, () => {
+    //On supprime le répertoire de dev_build
+    fs.removeSync('./build_dev');
+    //On stop les conteneurs docker
+    exec('docker-compose -f docker.yml stop');
+    process.exit(0);
+  });
+});
+
 //Vérification que les conteneurs tournent
 //Récupération de la config
 var content = JSON.parse(fs.readFileSync('indigo.json', 'utf8'));
@@ -12,6 +23,7 @@ var content = JSON.parse(fs.readFileSync('indigo.json', 'utf8'));
 var list_start = exec('docker ps').toString();
 //Si aucuns conteneurs allumés ne correspondent au nom des conteneurs du projet courant
 if(!list_start.includes(" "+content.docker_name+"_")){
+  console.log("Démarrage des conteneurs docker du projet...");
   //On start manuellement le docker compose
   exec('docker-compose -f docker.yml start');
 }
