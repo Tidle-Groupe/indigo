@@ -70,6 +70,11 @@ if(verif_base()){
     package_generate(repertoire);
     //On copie le fichier de config initial
     fs.copySync(global_dir+'\\node_modules\\@tidle-groupe\\indigo\\config.json', repertoire+'/config.json');
+    //On créer les répertoires css, js et static dans la source assets
+    fs.mkdirsSync(repertoire+'/sources/assets/css');
+    fs.mkdirsSync(repertoire+'/sources/assets/js');
+    fs.mkdirsSync(repertoire+'/sources/assets/static');
+
     console.log("Installation terminée");
 
     //Appel du script de d'installation docker
