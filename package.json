@@ -1,29 +1,32 @@
 {
-  "name": "compilateur-indigo",
+  "name": "@tidle-groupe/indigo",
   "version": "1.0.0",
-  "description": "Compilateur INDIGO",
-  "main": "index.js",
-  "scripts": {
-    "build-prod": "node build-prod.js",
-    "run-dev": "node serveur-dev.js",
-    "create-route": "node create-route.js",
-    "delete-route": "node delete-route.js",
-    "create-page": "node create-page.js",
-    "delete-page": "node delete-page.js"
+  "description": "Un framework de programmation léger avec rendu local du site, assets, api, bases de données et construction des fichiers pour la production.",
+  "main": "cmd/index.js",
+  "bin": {
+    "indigo": "bin/indigo"
   },
-  "author": "theostronaute",
-  "license": "ISC",
+  "author": "Théo Laubezout",
+  "license": "GPL-3.0",
+  "repository": {
+    "url": "git+https://github.com/Tidle-Groupe/indigo.git"
+  },
   "dependencies": {
     "@node-minify/core": "^6.1.0",
     "@node-minify/csso": "^6.1.0",
     "@node-minify/html-minifier": "^6.1.0",
     "@node-minify/uglify-es": "^6.1.0",
-    "child_process": "^1.0.2",
     "chokidar": "^3.4.3",
     "fs": "0.0.1-security",
     "fs-extra": "^9.0.1",
-    "http": "0.0.1-security",
-    "path": "^0.12.7",
-    "url": "^0.11.0"
+    "readline": "^1.3.0"
+  },
+  "bugs": {
+    "url": "https://github.com/Tidle-Groupe/indigo/issues"
+  },
+  "homepage": "https://github.com/Tidle-Groupe/indigo#readme",
+  "engines": {
+    "npm": ">=6.5.0",
+    "node": ">=10.0.0"
   }
 }
