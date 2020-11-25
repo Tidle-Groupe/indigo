@@ -56,157 +56,163 @@ function replace_domaines(input){
 
 exports.build_site = function (build){
 
-    //Variables de base
-    var bib_js_w = false;
-    build_route = [];
-    build_page = [];
-    
-    function get_layout(d, r) {
-        //Détection des layouts
-        var layout_get = fs.readdirSync('./sources/site/'+r+'/layout/'+d);
-        var lengthlayout = layout_get.length;
-        for(let a = 0; a < lengthlayout;){
-            //Vérification que l'élément existe
-            if(fs.pathExistsSync('./sources/site/'+r+'/layout/'+d+layout_get[a])){
-                //Si c'est un fichier
-                if(fs.lstatSync('./sources/site/'+r+'/layout/'+d+layout_get[a]).isFile()){
-                    if(get_extension(layout_get[a]) == "html"){
-                        layout_route.push(d+get_no_extension(layout_get[a]));
-                    }
-                }
+    //Vérification que le dossier sources existe
+    if(fs.pathExistsSync('./sources')){
 
-                //Si c'est un répertoire
-                if(fs.lstatSync('./sources/site/'+r+'/layout/'+d+layout_get[a]).isDirectory()){
-                    get_layout(d+layout_get[a]+'/', r);
-                }
-            }
-            a++;
-        }
-    }
-
-    //Suppression de l'ancien build
-    fs.removeSync("./"+dir_export+'/site');
-
-
-    //Gestion de la partie site
-
-    //Copie du fichier de routage
-    fs.copySync('./sources/site/routeur.php', './'+dir_export+'/site/routeur.php');
-
-    //Copie du fichier index
-    fs.copySync('./sources/site/index.php', './'+dir_export+'/site/index.php');
-
-    //Copie du fichier .htaccess
-    fs.copySync('./sources/site/.htaccess', './'+dir_export+'/site/.htaccess');
-
-    //Détection des routes présentes dans le dossier sources (sources/site/route1, sources/site/route2, etc.)
-    var routes = fs.readdirSync('./sources/site');
-
-    //Boucle d'execution dans le répertoire des routes
-    var lengthroutes = routes.length;
-    for(let a = 0; a < lengthroutes;){
-
-        //Vérification que l'élément existe
-        if(fs.pathExistsSync('./sources/site/'+routes[a])){
-            //Vérification qu'il s'agit bien d'un dossier
-            if(fs.lstatSync('./sources/site/'+routes[a]).isDirectory()){
-                //Ajout de la route dans le tableau de build_route
-                build_route.push(routes[a]);
-                //Création du tableau pour les pages de la route
-                build_page[routes[a]] = [];
-
-                //Création du répertoire de la route
-                fs.mkdirsSync('./'+dir_export+'/site/'+routes[a]);
-
-                //Déplacement du controleur de la route
-                fs.copySync('./sources/site/'+routes[a]+'/controleur.php', './'+dir_export+'/site/'+routes[a]+'/controleur.php');
-
-                //Récupération des layouts pour la route
-                var layout_route = [];
-                get_layout('', routes[a]);
-
-
-                //Détection des pages présentes dans la route
-                var page = fs.readdirSync('./sources/site/'+routes[a]+'/page');
-
-                //Boucle d'execution dans le répertoire des pages
-                var lengthpage = page.length;
-                for(let b = 0; b < lengthpage;){
-
-                    //Vérification que l'élément existe
-                    if(fs.pathExistsSync('./sources/site/'+routes[a]+'/page/'+page[b])){
-                        //Vérification qu'il s'agit bien d'un fichier
-                        if(fs.lstatSync('./sources/site/'+routes[a]+'/page/'+page[b]).isFile()){
-
-                            //Ajout de la page dans le tableau de build_page
-                            build_page[routes[a]].push(page[b]);
-
-                            //Récupération de la page
-                            var page_r = fs.readFileSync('./sources/site/'+routes[a]+'/page/'+page[b], 'utf8');
-
-                            //Récupération du fichier de la page sans extension
-                            var page_name = get_no_extension(page[b]);
-
-                            //Parsage du po avec renvois sous forme de code html
-                            var page_r = po.parse(page_r, routes[a]);
-
-                            //Ajout de la bibliothèque de scripts js
-                            if(page_r.includes("<indigo-js></indigo-js>")){
-                                //pour le retour de la création de la bibliothèque dans la section assets
-                                var bib_js_w = true;
-
-                                //Remplacement par la balise de script
-                                var page_r = replaceAll("<indigo-js></indigo-js>", "<script src=\""+domaine_assets+"/js/indigo/script.js\"></script>", page_r);
-                            }
-
-                            //Remplacement des layouts
-                            var lengthlayout = layout_route.length;
-                            for(let c = 0; c < lengthlayout;){
-                                //Vérification qu'il s'agit bien d'un fichier
-                                var layout_return = fs.readFileSync('./sources/site/'+routes[a]+'/layout/'+layout_route[c]+'.html', 'utf8');
-                                var page_r = replaceAll("<indigo:"+layout_route[c]+"></indigo>", layout_return, page_r);
-                                c++;
-                            }
-
-                            //Remplacement des variables
-                            var lengthvar = config.variables.length;
-                            for(let c = 0; c < lengthvar;){
-                                var page_r = replaceAll("{{{indigo:"+config.variables[c].var+"}}}", config.variables[c].replace, page_r);
-                                c++;
-                            }
-
-                            var page_r = replace_domaines(page_r);
-
-                            //Réecriture du fichier
-                            fs.writeFileSync('./'+dir_export+'/site/'+routes[a]+'/'+page_name+'.html', page_r, 'utf8');
-
-                            //minify du fichier
-                            minify({
-                                compressor: htmlMinifier,
-                                input: './'+dir_export+'/site/'+routes[a]+'/'+page_name+'.html',
-                                output: './'+dir_export+'/site/'+routes[a]+'/'+page_name+'.html',
-                                options: {
-                                    removeAttributeQuotes: false,
-                                    removeComments: true,
-                                    collapseInlineTagWhitespace: false,
-                                    removeOptionalTags: false
-                                }
-                            });
-
+        //Variables de base
+        var bib_js_w = false;
+        build_route = [];
+        build_page = [];
+        
+        function get_layout(d, r) {
+            //Détection des layouts
+            var layout_get = fs.readdirSync('./sources/site/'+r+'/layout/'+d);
+            var lengthlayout = layout_get.length;
+            for(let a = 0; a < lengthlayout;){
+                //Vérification que l'élément existe
+                if(fs.pathExistsSync('./sources/site/'+r+'/layout/'+d+layout_get[a])){
+                    //Si c'est un fichier
+                    if(fs.lstatSync('./sources/site/'+r+'/layout/'+d+layout_get[a]).isFile()){
+                        if(get_extension(layout_get[a]) == "html"){
+                            layout_route.push(d+get_no_extension(layout_get[a]));
                         }
                     }
 
-                    b ++;
+                    //Si c'est un répertoire
+                    if(fs.lstatSync('./sources/site/'+r+'/layout/'+d+layout_get[a]).isDirectory()){
+                        get_layout(d+layout_get[a]+'/', r);
+                    }
                 }
+                a++;
             }
         }
 
-        a ++;
-    }
-    if(bib_js_w){
-        return true;
+        //Suppression de l'ancien build
+        fs.removeSync("./"+dir_export+'/site');
+
+
+        //Gestion de la partie site
+
+        //Copie du fichier de routage
+        fs.copySync('./sources/site/routeur.php', './'+dir_export+'/site/routeur.php');
+
+        //Copie du fichier index
+        fs.copySync('./sources/site/index.php', './'+dir_export+'/site/index.php');
+
+        //Copie du fichier .htaccess
+        fs.copySync('./sources/site/.htaccess', './'+dir_export+'/site/.htaccess');
+
+        //Détection des routes présentes dans le dossier sources (sources/site/route1, sources/site/route2, etc.)
+        var routes = fs.readdirSync('./sources/site');
+
+        //Boucle d'execution dans le répertoire des routes
+        var lengthroutes = routes.length;
+        for(let a = 0; a < lengthroutes;){
+
+            //Vérification que l'élément existe
+            if(fs.pathExistsSync('./sources/site/'+routes[a])){
+                //Vérification qu'il s'agit bien d'un dossier
+                if(fs.lstatSync('./sources/site/'+routes[a]).isDirectory()){
+                    //Ajout de la route dans le tableau de build_route
+                    build_route.push(routes[a]);
+                    //Création du tableau pour les pages de la route
+                    build_page[routes[a]] = [];
+
+                    //Création du répertoire de la route
+                    fs.mkdirsSync('./'+dir_export+'/site/'+routes[a]);
+
+                    //Déplacement du controleur de la route
+                    fs.copySync('./sources/site/'+routes[a]+'/controleur.php', './'+dir_export+'/site/'+routes[a]+'/controleur.php');
+
+                    //Récupération des layouts pour la route
+                    var layout_route = [];
+                    get_layout('', routes[a]);
+
+
+                    //Détection des pages présentes dans la route
+                    var page = fs.readdirSync('./sources/site/'+routes[a]+'/page');
+
+                    //Boucle d'execution dans le répertoire des pages
+                    var lengthpage = page.length;
+                    for(let b = 0; b < lengthpage;){
+
+                        //Vérification que l'élément existe
+                        if(fs.pathExistsSync('./sources/site/'+routes[a]+'/page/'+page[b])){
+                            //Vérification qu'il s'agit bien d'un fichier
+                            if(fs.lstatSync('./sources/site/'+routes[a]+'/page/'+page[b]).isFile()){
+
+                                //Ajout de la page dans le tableau de build_page
+                                build_page[routes[a]].push(page[b]);
+
+                                //Récupération de la page
+                                var page_r = fs.readFileSync('./sources/site/'+routes[a]+'/page/'+page[b], 'utf8');
+
+                                //Récupération du fichier de la page sans extension
+                                var page_name = get_no_extension(page[b]);
+
+                                //Parsage du po avec renvois sous forme de code html
+                                var page_r = po.parse(page_r, routes[a]);
+
+                                //Ajout de la bibliothèque de scripts js
+                                if(page_r.includes("<indigo-js></indigo-js>")){
+                                    //pour le retour de la création de la bibliothèque dans la section assets
+                                    var bib_js_w = true;
+
+                                    //Remplacement par la balise de script
+                                    var page_r = replaceAll("<indigo-js></indigo-js>", "<script src=\""+domaine_assets+"/js/indigo/script.js\"></script>", page_r);
+                                }
+
+                                //Remplacement des layouts
+                                var lengthlayout = layout_route.length;
+                                for(let c = 0; c < lengthlayout;){
+                                    //Vérification qu'il s'agit bien d'un fichier
+                                    var layout_return = fs.readFileSync('./sources/site/'+routes[a]+'/layout/'+layout_route[c]+'.html', 'utf8');
+                                    var page_r = replaceAll("<indigo:"+layout_route[c]+"></indigo>", layout_return, page_r);
+                                    c++;
+                                }
+
+                                //Remplacement des variables
+                                var lengthvar = config.variables.length;
+                                for(let c = 0; c < lengthvar;){
+                                    var page_r = replaceAll("{{{indigo:"+config.variables[c].var+"}}}", config.variables[c].replace, page_r);
+                                    c++;
+                                }
+
+                                var page_r = replace_domaines(page_r);
+
+                                //Réecriture du fichier
+                                fs.writeFileSync('./'+dir_export+'/site/'+routes[a]+'/'+page_name+'.html', page_r, 'utf8');
+
+                                //minify du fichier
+                                minify({
+                                    compressor: htmlMinifier,
+                                    input: './'+dir_export+'/site/'+routes[a]+'/'+page_name+'.html',
+                                    output: './'+dir_export+'/site/'+routes[a]+'/'+page_name+'.html',
+                                    options: {
+                                        removeAttributeQuotes: false,
+                                        removeComments: true,
+                                        collapseInlineTagWhitespace: false,
+                                        removeOptionalTags: false
+                                    }
+                                });
+
+                            }
+                        }
+
+                        b ++;
+                    }
+                }
+            }
+
+            a ++;
+        }
+        if(bib_js_w){
+            return true;
+        }else{
+            return false;
+        }
     }else{
-        return false;
+        return 'error';
     }
 }
 exports.build_assets = function (build, bib_js){

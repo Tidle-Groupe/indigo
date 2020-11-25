@@ -52,7 +52,7 @@ function get_global_directory(){
 function package_generate(name){
     //Passage du nom en caractères alphanumérique
     var namer = name.split(/\W/g).join('');
-    var json = '{\r\n  "name": "'+namer+'",\r\n  "version": "0.0.0",\r\n  "scripts": {\r\n    "Build": "indigo build",\r\n    "Run": "indigo run",\r\n    "Docker": "indigo docker"\r\n  },\r\n  "private": true\r\n}';
+    var json = '{\r\n  "name": "'+namer+'",\r\n  "version": "0.0.0",\r\n  "scripts": {\r\n    "Build": "indigo build",\r\n    "Run": "indigo run",\r\n    "Docker": "indigo docker"\r\n  },\r\n  "private": true,\r\n  "devDependencies": {\r\n    "@tidle-groupe/indigo": "^1.0.0"\r\n  }\r\n}';
     fs.writeFileSync(name+'/package.json', json, 'utf8');
 }
 
@@ -70,6 +70,11 @@ if(verif_base()){
     package_generate(repertoire);
     //On copie le fichier de config initial
     fs.copySync(global_dir+'\\node_modules\\@tidle-groupe\\indigo\\config.json', repertoire+'/config.json');
+    //On créer les répertoires css, js et static dans la source assets
+    fs.mkdirsSync(repertoire+'/sources/assets/css');
+    fs.mkdirsSync(repertoire+'/sources/assets/js');
+    fs.mkdirsSync(repertoire+'/sources/assets/static');
+
     console.log("Installation terminée");
 
     //Appel du script de d'installation docker
