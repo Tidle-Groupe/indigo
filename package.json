@@ -12,7 +12,7 @@
     "url": "git+https://github.com/Tidle-Groupe/indigo.git"
   },
   "dependencies": {
-    "@node-minify/core": "^7.0.0",
+    "@node-minify/core": "^8.0.6",
     "@node-minify/csso": "^7.0.0",
     "@node-minify/html-minifier": "^7.0.0",
     "@node-minify/uglify-es": "^7.0.0",
