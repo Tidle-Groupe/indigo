@@ -15,7 +15,7 @@
     "@node-minify/core": "^7.0.0",
     "@node-minify/csso": "^7.0.0",
     "@node-minify/html-minifier": "^7.0.0",
-    "@node-minify/uglify-es": "^7.0.0",
+    "@node-minify/uglify-es": "^8.0.6",
     "chokidar": "^3.4.3",
     "fs": "0.0.1-security",
     "fs-extra": "^10.0.0",
