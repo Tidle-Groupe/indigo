@@ -16,7 +16,7 @@
     "@node-minify/csso": "^7.0.0",
     "@node-minify/html-minifier": "^7.0.0",
     "@node-minify/uglify-es": "^9.0.1",
-    "@node-minify/core": "^8.0.6",
+    "@node-minify/core": "^9.0.2",
     "@node-minify/csso": "^9.0.1",
     "@node-minify/html-minifier": "^8.0.6",
     "@node-minify/uglify-es": "^8.0.6",
